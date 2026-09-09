@@ -1,0 +1,56 @@
+export interface Series {
+  id: string;
+  created_at: string;
+  title: string;
+  description?: string;
+}
+
+export interface Project {
+  id: string; // uuid
+  created_at: string;
+  title: string;
+  slug: string;
+  genre: string;
+  template: string;
+  series_id?: string; // optional link to a series
+  last_edited_at: string;
+}
+
+export interface Chapter {
+  id: string; // uuid
+  project_id: string; // foreign key
+  title: string;
+  sort_order: number;
+}
+
+export interface Scene {
+  id: string; // uuid
+  chapter_id: string; // foreign key
+  project_id: string; // denormalized for easier querying
+  title: string;
+  content: string;
+  word_count: number;
+  sort_order: number;
+  notes?: string;
+}
+
+export interface Character {
+  id: string; // uuid
+  project_id: string; // fk (can be a dummy if shared across series)
+  series_id?: string; // link to shared series database
+  name: string;
+  role: string;
+  archetype: string;
+  avatarUrl: string;
+  color: string;
+}
+
+export interface WorldItem {
+  id: string; // uuid
+  project_id: string; // fk
+  series_id?: string; // link to shared series database
+  name: string;
+  category: 'Location' | 'Item' | 'Lore';
+  description: string;
+  imageUrl: string;
+}
