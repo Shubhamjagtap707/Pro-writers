@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Mail, Lock, Loader2, AlertCircle, ArrowRight } from 'lucide-react';
+import { Mail, Lock, Loader2, AlertCircle, ArrowRight, Eye, EyeOff, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Auth() {
@@ -11,6 +11,8 @@ export default function Auth() {
   const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
@@ -30,7 +32,10 @@ export default function Auth() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin },
+          options: { 
+            data: { full_name: name },
+            emailRedirectTo: window.location.origin 
+          },
         });
         if (error) throw error;
         setMessage({ text: 'Success! Please check your email to verify your account.', type: 'success' });
@@ -136,6 +141,27 @@ export default function Auth() {
                 </div>
               </div>
 
+              {mode === 'signup' && (
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-[#c7c4d7]/80 uppercase tracking-wider ml-1">
+                    Name
+                  </label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#908fa0] group-focus-within:text-[#c0c1ff] transition-colors">
+                      <User className="w-5 h-5" />
+                    </div>
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="John Doe"
+                      required
+                      className="w-full pl-11 pr-4 py-3.5 bg-[#060e20]/50 border border-white/5 rounded-2xl text-[#dae2fd] placeholder-[#908fa0]/50 focus:outline-none focus:ring-2 focus:ring-[#8083ff]/50 focus:bg-[#060e20]/80 transition-all duration-300"
+                    />
+                  </div>
+                </div>
+              )}
+
               {mode !== 'forgot' && (
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-[#c7c4d7]/80 uppercase tracking-wider ml-1 flex justify-between">
@@ -155,14 +181,21 @@ export default function Auth() {
                       <Lock className="w-5 h-5" />
                     </div>
                     <input
-                      type="password"
+                      type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
                       required
                       minLength={6}
-                      className="w-full pl-11 pr-4 py-3.5 bg-[#060e20]/50 border border-white/5 rounded-2xl text-[#dae2fd] placeholder-[#908fa0]/50 focus:outline-none focus:ring-2 focus:ring-[#8083ff]/50 focus:bg-[#060e20]/80 transition-all duration-300"
+                      className="w-full pl-11 pr-12 py-3.5 bg-[#060e20]/50 border border-white/5 rounded-2xl text-[#dae2fd] placeholder-[#908fa0]/50 focus:outline-none focus:ring-2 focus:ring-[#8083ff]/50 focus:bg-[#060e20]/80 transition-all duration-300"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-[#908fa0] hover:text-[#c0c1ff] transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
                   </div>
                 </div>
               )}

@@ -19,6 +19,7 @@ import Templates from './pages/Templates';
 import Archive from './pages/Archive';
 import Help from './pages/Help';
 import Auth from './pages/Auth';
+import ResetPassword from './pages/ResetPassword';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './lib/AuthContext';
 
@@ -29,6 +30,7 @@ export default function App() {
         <Routes>
           {/* Public Route */}
           <Route path="/auth" element={<Auth />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
