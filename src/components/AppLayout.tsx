@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useLocation, Outlet } from 'react-router-dom';
 import GlobalSidebar from './GlobalSidebar';
