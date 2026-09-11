@@ -23,6 +23,8 @@ import ResetPassword from './pages/ResetPassword';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './lib/AuthContext';
 import { ThemeProvider } from './lib/ThemeProvider';
+import Settings from './pages/Settings';
+import Profile from './pages/Profile';
 
 export default function App() {
   return (
@@ -42,6 +44,8 @@ export default function App() {
               <Route path="/templates" element={<Templates />} />
               <Route path="/archive" element={<Archive />} />
               <Route path="/help" element={<Help />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/profile" element={<Profile />} />
 
               {/* Fallback to bounce old flat routes */}
               <Route path="/editor" element={<Navigate to="/" replace />} />

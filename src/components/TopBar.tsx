@@ -271,7 +271,10 @@ export default function TopBar() {
                 className="absolute right-0 mt-2 w-48 bg-surface-container-high border border-outline-variant/20 rounded-xl shadow-xl overflow-hidden z-50"
               >
                 <div className="py-1">
-                  <button className="w-full px-4 py-2 text-left text-sm text-on-surface hover:bg-surface-container-highest transition-colors flex items-center gap-2">
+                  <button 
+                    onClick={() => { navigate('/settings'); setShowSettingsMenu(false); }}
+                    className="w-full px-4 py-2 text-left text-sm text-on-surface hover:bg-surface-container-highest transition-colors flex items-center gap-2"
+                  >
                     <span className="material-symbols-outlined text-[18px]">manage_accounts</span>
                     Account Settings
                   </button>
@@ -350,7 +353,10 @@ export default function TopBar() {
                   </p>
                 </div>
                 <div className="py-1">
-                  <button className="w-full px-4 py-2 text-left text-sm text-on-surface hover:bg-surface-container-highest transition-colors flex items-center gap-2">
+                  <button 
+                    onClick={() => { navigate('/profile'); setShowProfileMenu(false); }}
+                    className="w-full px-4 py-2 text-left text-sm text-on-surface hover:bg-surface-container-highest transition-colors flex items-center gap-2"
+                  >
                     <span className="material-symbols-outlined text-[18px]">person</span>
                     Your Profile
                   </button>

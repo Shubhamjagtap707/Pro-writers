@@ -10,7 +10,7 @@ const templates = [
     badgeBg: 'bg-surface/80',
     badgeText: 'text-primary',
     title: 'Novel',
-    titleColor: 'text-primary-fixed',
+    titleColor: 'text-primary',
     desc: 'A sprawling canvas for epic narratives. Features chapter-based navigation, world-building wiki integration, and character dossiers.',
     meta: '350+ Pages Capacity',
     featured: false,

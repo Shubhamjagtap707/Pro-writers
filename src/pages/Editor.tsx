@@ -171,7 +171,7 @@ export default function Editor() {
                             onChange={e => setEditTitle(e.target.value)}
                             onBlur={() => submitEdit(scene.id, false)}
                             onKeyDown={e => e.key === 'Enter' && submitEdit(scene.id, false)}
-                            className="bg-transparent text-white outline-none w-full"
+                            className="bg-transparent text-on-surface outline-none w-full"
                           />
                         ) : (
                           <>
@@ -198,17 +198,7 @@ export default function Editor() {
           </div>
         </div>
 
-        <div className="pt-8 border-t border-outline-variant/10">
-          <h3 className="text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-4 font-bold font-headline">Trash &amp; Folders</h3>
-          <div className="space-y-1">
-            {['delete', 'folder'].map((icon, i) => (
-              <div key={icon} className="flex items-center gap-3 py-2 px-3 text-slate-400 text-xs hover:bg-surface-container-high rounded-lg cursor-pointer transition-colors">
-                <span className="material-symbols-outlined text-sm">{icon}</span>
-                <span>{i === 0 ? 'Deleted Fragments' : 'World Building'}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+
       </aside>
 
       {/* Main Canvas */}
