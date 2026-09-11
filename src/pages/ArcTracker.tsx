@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
 
 const arcs = [
-  { char: 'Silas Thorne', role: 'Protagonist', color: '#c0c1ff', points: [20, 35, 45, 60, 55, 75, 80, 95] },
-  { char: 'Elara Vance', role: 'Confidant', color: '#ffb783', points: [10, 15, 30, 40, 45, 50, 65, 70] },
+  { char: 'Silas Thorne', role: 'Protagonist', color: 'var(--color-primary)', points: [20, 35, 45, 60, 55, 75, 80, 95] },
+  { char: 'Elara Vance', role: 'Confidant', color: 'var(--color-tertiary)', points: [10, 15, 30, 40, 45, 50, 65, 70] },
 ];
 
 const chapters = ['Ch 1', 'Ch 2', 'Ch 3', 'Ch 4', 'Ch 5', 'Ch 6', 'Ch 7', 'Ch 8'];
@@ -12,10 +12,10 @@ function toPolyline(points: number[], width: number, height: number) {
 }
 
 const arcHealth = [
-  { name: 'Character Growth', score: 82, color: '#c0c1ff' },
-  { name: 'Tension Curve', score: 71, color: '#ffb783' },
+  { name: 'Character Growth', score: 82, color: 'var(--color-primary)' },
+  { name: 'Tension Curve', score: 71, color: 'var(--color-tertiary)' },
   { name: 'Pacing', score: 90, color: '#4ade80' },
-  { name: 'Emotional Depth', score: 65, color: '#cebdff' },
+  { name: 'Emotional Depth', score: 65, color: 'var(--color-secondary)' },
 ];
 
 export default function ArcTracker() {
@@ -28,17 +28,17 @@ export default function ArcTracker() {
       <div className="page-content">
         <div className="max-w-6xl mx-auto space-y-10">
           <div>
-            <span className="text-[#c0c1ff] text-xs font-bold uppercase tracking-[0.2em] mb-2 block">Narrative Analysis Engine</span>
-            <h1 className="text-5xl font-body text-[#dae2fd] mb-4">Arc Progression</h1>
+            <span className="text-primary text-xs font-bold uppercase tracking-[0.2em] mb-2 block">Narrative Analysis Engine</span>
+            <h1 className="text-5xl font-body text-on-surface mb-4">Arc Progression</h1>
           </div>
 
           {/* Arc Chart */}
           <motion.div
             initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-            className="bg-[#131b2e] rounded-[2rem] p-8"
+            className="bg-surface-container-low rounded-[2rem] p-8"
           >
             <div className="flex items-center justify-between mb-8">
-              <h3 className="font-headline font-bold text-[#dae2fd]">Character Arc Visualization</h3>
+              <h3 className="font-headline font-bold text-on-surface">Character Arc Visualization</h3>
               <div className="flex items-center gap-6">
                 {arcs.map(arc => (
                   <div key={arc.char} className="flex items-center gap-2">
@@ -55,7 +55,7 @@ export default function ArcTracker() {
                 {/* Grid lines */}
                 {[0, 25, 50, 75, 100].map(p => (
                   <line key={p} x1="0" y1={200 - p * 2} x2="800" y2={200 - p * 2}
-                    stroke="#464554" strokeOpacity="0.15" strokeWidth="1" />
+                    stroke="var(--color-outline-variant)" strokeOpacity="0.15" strokeWidth="1" />
                 ))}
                 {/* Arc lines */}
                 {arcs.map(arc => (
@@ -101,17 +101,17 @@ export default function ArcTracker() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <motion.div
               initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-              className="bg-[#131b2e] rounded-[2rem] p-8"
+              className="bg-surface-container-low rounded-[2rem] p-8"
             >
-              <h3 className="font-headline font-bold text-[#dae2fd] mb-6">Arc Health Score</h3>
+              <h3 className="font-headline font-bold text-on-surface mb-6">Arc Health Score</h3>
               <div className="space-y-5">
                 {arcHealth.map(metric => (
                   <div key={metric.name}>
                     <div className="flex justify-between mb-2">
-                      <span className="text-sm font-medium text-[#c7c4d7]">{metric.name}</span>
+                      <span className="text-sm font-medium text-on-surface-variant">{metric.name}</span>
                       <span className="text-sm font-bold" style={{ color: metric.color }}>{metric.score}%</span>
                     </div>
-                    <div className="h-1.5 w-full bg-[#222a3d] rounded-full overflow-hidden">
+                    <div className="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden">
                       <motion.div
                         className="h-full rounded-full"
                         initial={{ width: 0 }}
@@ -127,18 +127,18 @@ export default function ArcTracker() {
 
             <motion.div
               initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-              className="bg-[#131b2e] rounded-[2rem] p-8"
+              className="bg-surface-container-low rounded-[2rem] p-8"
             >
-              <h3 className="font-headline font-bold text-[#dae2fd] mb-6">AI Arc Suggestions</h3>
+              <h3 className="font-headline font-bold text-on-surface mb-6">AI Arc Suggestions</h3>
               <div className="space-y-4">
                 {[
-                  { icon: 'trending_up', text: 'Silas\'s emotional arc peaks too early — consider adding a setback at Chapter 6.', color: 'text-[#c0c1ff]' },
-                  { icon: 'warning', text: 'Tension dips significantly in Chapter 5. This may cause reader engagement drop.', color: 'text-[#ffb783]' },
+                  { icon: 'trending_up', text: 'Silas\'s emotional arc peaks too early — consider adding a setback at Chapter 6.', color: 'text-primary' },
+                  { icon: 'warning', text: 'Tension dips significantly in Chapter 5. This may cause reader engagement drop.', color: 'text-tertiary' },
                   { icon: 'check_circle', text: 'Elara\'s growth trajectory is well-paced and consistent.', color: 'text-[#4ade80]' },
                 ].map((sug, i) => (
-                  <div key={i} className="flex gap-3 p-4 bg-[#171f33] rounded-xl">
+                  <div key={i} className="flex gap-3 p-4 bg-surface-container rounded-xl">
                     <span className={`material-symbols-outlined text-sm flex-shrink-0 mt-0.5 ${sug.color}`}>{sug.icon}</span>
-                    <p className="text-sm text-[#c7c4d7] font-body">{sug.text}</p>
+                    <p className="text-sm text-on-surface-variant font-body">{sug.text}</p>
                   </div>
                 ))}
               </div>

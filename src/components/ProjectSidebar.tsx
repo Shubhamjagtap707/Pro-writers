@@ -65,19 +65,19 @@ export default function ProjectSidebar() {
       initial="hidden"
       animate="visible"
       exit="exit"
-      className="h-screen flex flex-col py-8 px-6 bg-[#131b2e] z-40 rounded-r-3xl overflow-hidden shrink-0 border-r border-[#171f33]/50"
+      className="h-screen flex flex-col py-8 px-6 bg-surface-container-low z-40 rounded-r-3xl overflow-hidden shrink-0 border-r border-surface-container/50"
     >
       {/* Project Header */}
       <div className="mb-8 relative">
         <button 
           onClick={() => { setActiveProject(null); navigate('/'); }}
-          className="absolute -top-4 -left-2 p-2 text-slate-500 hover:text-[#c0c1ff] transition-colors flex items-center justify-center rounded-full hover:bg-[#171f33]"
+          className="absolute -top-4 -left-2 p-2 text-slate-500 hover:text-primary transition-colors flex items-center justify-center rounded-full hover:bg-surface-container"
           title="Return to Library"
         >
           <span className="material-symbols-outlined text-[20px]">arrow_back</span>
         </button>
         <div className="pl-8 group">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-[#c0c1ff] font-bold font-headline mb-1">Active Project</p>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-bold font-headline mb-1">Active Project</p>
           {isEditingTitle ? (
             <input 
               autoFocus
@@ -85,18 +85,18 @@ export default function ProjectSidebar() {
               onChange={e => setEditTitle(e.target.value)}
               onBlur={submitEdit}
               onKeyDown={e => e.key === 'Enter' && submitEdit()}
-              className="bg-transparent border-b border-[#c0c1ff] outline-none text-[#dae2fd] text-xl tracking-tight font-body w-full truncate"
+              className="bg-transparent border-b border-primary outline-none text-on-surface text-xl tracking-tight font-body w-full truncate"
             />
           ) : (
             <div className="flex items-center gap-1 cursor-text" onDoubleClick={startEdit}>
-              <h2 className="text-xl font-bold text-[#dae2fd] tracking-tight font-body leading-tight truncate" title={activeProject.title}>
+              <h2 className="text-xl font-bold text-on-surface tracking-tight font-body leading-tight truncate" title={activeProject.title}>
                 {activeProject.title}
               </h2>
               <span className="material-symbols-outlined text-[14px] text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">edit</span>
             </div>
           )}
           <div className="mt-4 flex items-center justify-start flex-wrap gap-2">
-            <span className="px-3 py-1 rounded-full bg-[#4f319c]/20 text-[10px] text-[#bea8ff] capitalize tracking-wider border border-[#4f319c]/30 font-bold font-headline select-none">
+            <span className="px-3 py-1 rounded-full bg-secondary-container/20 text-[10px] text-on-secondary-container capitalize tracking-wider border border-secondary-container/30 font-bold font-headline select-none">
                {activeProject.genre === 'Unassigned' ? activeProject.template : activeProject.genre}
             </span>
           </div>
@@ -113,8 +113,8 @@ export default function ProjectSidebar() {
             to={destination}
             className={({ isActive: active }) =>
               `group flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all duration-300 ease-out ${active
-                ? 'bg-[#171f33] text-[#c0c1ff] font-semibold border-l-2 border-[#6366f1]'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-[#222a3d]'
+                ? 'bg-surface-container text-primary font-semibold border-l-2 border-primary'
+                : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
               }`
             }
           >
@@ -145,8 +145,8 @@ export default function ProjectSidebar() {
             to={destination}
             className={({ isActive: active }) =>
               `group flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-all duration-300 ease-out ${active
-                ? 'bg-[#171f33] text-[#c0c1ff] font-semibold border-l-2 border-[#6366f1]'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-[#222a3d]'
+                ? 'bg-surface-container text-primary font-semibold border-l-2 border-primary'
+                : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
               }`
             }
           >

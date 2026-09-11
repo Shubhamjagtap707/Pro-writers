@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { useLocation, NavLink, useNavigate } from 'react-router-dom';
 import { useProjectStore } from '../store/useProjectStore';
 import { useAuth } from '../lib/AuthContext';
+import { useTheme } from '../lib/ThemeProvider';
 import { AnimatePresence, motion } from 'framer-motion';
 
 /** Map route → display title (used in the top bar centre title) */
@@ -37,6 +38,7 @@ export default function TopBar() {
   const navigate = useNavigate();
   const { activeProjectId, projects, characters, worldItems } = useProjectStore();
   const { user, signOut } = useAuth();
+  const { theme, setTheme } = useTheme();
   const activeProject = activeProjectId ? projects[activeProjectId] : null;
 
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -273,10 +275,34 @@ export default function TopBar() {
                     <span className="material-symbols-outlined text-[18px]">manage_accounts</span>
                     Account Settings
                   </button>
-                  <button className="w-full px-4 py-2 text-left text-sm text-on-surface hover:bg-surface-container-highest transition-colors flex items-center gap-2">
-                    <span className="material-symbols-outlined text-[18px]">palette</span>
-                    Appearance
-                  </button>
+                  <div className="h-px bg-outline-variant/10 my-1" />
+                  <div className="px-4 py-2">
+                    <p className="text-xs font-semibold text-on-surface-variant mb-2 uppercase tracking-wider">Theme</p>
+                    <div className="flex flex-col gap-1">
+                      <button 
+                        onClick={() => setTheme('midnight')}
+                        className={`text-left text-sm px-2 py-1.5 rounded flex items-center gap-2 transition-colors ${theme === 'midnight' ? 'bg-primary/10 text-primary font-medium' : 'text-on-surface hover:bg-surface-container-highest'}`}
+                      >
+                        <span className="material-symbols-outlined text-[16px]">dark_mode</span>
+                        Midnight Blue
+                      </button>
+                      <button 
+                        onClick={() => setTheme('black')}
+                        className={`text-left text-sm px-2 py-1.5 rounded flex items-center gap-2 transition-colors ${theme === 'black' ? 'bg-primary/10 text-primary font-medium' : 'text-on-surface hover:bg-surface-container-highest'}`}
+                      >
+                        <span className="material-symbols-outlined text-[16px]">contrast</span>
+                        Pure Black
+                      </button>
+                      <button 
+                        onClick={() => setTheme('light')}
+                        className={`text-left text-sm px-2 py-1.5 rounded flex items-center gap-2 transition-colors ${theme === 'light' ? 'bg-primary/10 text-primary font-medium' : 'text-on-surface hover:bg-surface-container-highest'}`}
+                      >
+                        <span className="material-symbols-outlined text-[16px]">light_mode</span>
+                        Clean White
+                      </button>
+                    </div>
+                  </div>
+                  <div className="h-px bg-outline-variant/10 my-1" />
                   <button className="w-full px-4 py-2 text-left text-sm text-on-surface hover:bg-surface-container-highest transition-colors flex items-center gap-2">
                     <span className="material-symbols-outlined text-[18px]">keyboard</span>
                     Shortcuts

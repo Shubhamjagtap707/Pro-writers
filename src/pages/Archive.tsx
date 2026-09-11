@@ -48,23 +48,23 @@ export default function Archive() {
       <div className="page-content">
         {/* Hero Header */}
         <div className="mb-12">
-          <span className="text-[#c0c1ff] text-xs font-bold uppercase tracking-[0.2em] mb-2 block">The Vault of Completed Works</span>
-          <h1 className="text-5xl font-body text-[#dae2fd] mb-4">Project Archive</h1>
-          <p className="text-[#c7c4d7] font-body text-lg max-w-xl">Every completed manuscript, preserved in amber ink. Browse, restore, or export your past creations.</p>
+          <span className="text-primary text-xs font-bold uppercase tracking-[0.2em] mb-2 block">The Vault of Completed Works</span>
+          <h1 className="text-5xl font-body text-on-surface mb-4">Project Archive</h1>
+          <p className="text-on-surface-variant font-body text-lg max-w-xl">Every completed manuscript, preserved in amber ink. Browse, restore, or export your past creations.</p>
         </div>
 
         {/* Stats Row */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
           {[
-            { label: 'Archived Projects', value: '12', icon: 'inventory_2', color: 'text-[#c0c1ff]' },
-            { label: 'Total Words', value: '843k', icon: 'edit_note', color: 'text-[#ffb783]' },
-            { label: 'Oldest Project', value: '2022', icon: 'history', color: 'text-[#cebdff]' },
+            { label: 'Archived Projects', value: '12', icon: 'inventory_2', color: 'text-primary' },
+            { label: 'Total Words', value: '843k', icon: 'edit_note', color: 'text-tertiary' },
+            { label: 'Oldest Project', value: '2022', icon: 'history', color: 'text-secondary' },
             { label: 'Latest Archive', value: 'Feb 2025', icon: 'calendar_month', color: 'text-[#4ade80]' },
           ].map((stat, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
-              className="bg-[#131b2e] rounded-2xl p-6 flex items-center gap-4"
+              className="bg-surface-container-low rounded-2xl p-6 flex items-center gap-4"
             >
               <div className={`material-symbols-outlined text-2xl ${stat.color}`}>{stat.icon}</div>
               <div>
@@ -81,36 +81,36 @@ export default function Archive() {
             <motion.div
               key={project.title}
               initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
-              className="bg-[#131b2e] rounded-[2rem] overflow-hidden group cursor-pointer border border-transparent hover:border-[#c0c1ff]/20 transition-all duration-300"
+              className="bg-surface-container-low rounded-[2rem] overflow-hidden group cursor-pointer border border-transparent hover:border-primary/20 transition-all duration-300"
             >
               <div className="h-48 overflow-hidden relative">
                 <img className="w-full h-full object-cover opacity-50 grayscale group-hover:opacity-70 group-hover:grayscale-0 transition-all duration-700"
                   src={project.img} alt={project.title} />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#131b2e] via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-surface-container-low via-transparent to-transparent" />
                 <div className="absolute top-4 right-4">
-                  <span className="px-2 py-1 rounded-full bg-[#0b1326]/80 backdrop-blur text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  <span className="px-2 py-1 rounded-full bg-surface/80 backdrop-blur text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                     {project.genre}
                   </span>
                 </div>
               </div>
               <div className="p-6">
-                <h3 className="font-body text-xl text-[#dae2fd] mb-1 group-hover:text-[#c0c1ff] transition-colors">{project.title}</h3>
+                <h3 className="font-body text-xl text-on-surface mb-1 group-hover:text-primary transition-colors">{project.title}</h3>
                 <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-4">Archived {project.archivedDate}</p>
                 <div className="grid grid-cols-2 gap-3 mb-4">
-                  <div className="bg-[#171f33] rounded-xl p-3">
+                  <div className="bg-surface-container rounded-xl p-3">
                     <p className="text-[10px] text-slate-500 uppercase tracking-wider font-bold mb-0.5">Words</p>
-                    <p className="text-[#dae2fd] font-body">{project.words}</p>
+                    <p className="text-on-surface font-body">{project.words}</p>
                   </div>
-                  <div className="bg-[#171f33] rounded-xl p-3">
+                  <div className="bg-surface-container rounded-xl p-3">
                     <p className="text-[10px] text-slate-500 uppercase tracking-wider font-bold mb-0.5">Chapters</p>
-                    <p className="text-[#dae2fd] font-body">{project.chapters}</p>
+                    <p className="text-on-surface font-body">{project.chapters}</p>
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button className="flex-1 py-2 text-xs font-bold text-[#c0c1ff] bg-[#c0c1ff]/10 rounded-xl hover:bg-[#c0c1ff]/20 transition-colors flex items-center justify-center gap-1">
+                  <button className="flex-1 py-2 text-xs font-bold text-primary bg-primary/10 rounded-xl hover:bg-primary/20 transition-colors flex items-center justify-center gap-1">
                     <span className="material-symbols-outlined text-sm">restore</span> Restore
                   </button>
-                  <button className="py-2 px-3 text-xs font-bold text-slate-400 bg-[#222a3d] rounded-xl hover:text-[#dae2fd] transition-colors">
+                  <button className="py-2 px-3 text-xs font-bold text-slate-400 bg-surface-container-high rounded-xl hover:text-on-surface transition-colors">
                     <span className="material-symbols-outlined text-sm">file_download</span>
                   </button>
                 </div>

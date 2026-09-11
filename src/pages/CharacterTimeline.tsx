@@ -13,9 +13,9 @@ const presence = [
 ];
 
 function getColor(val: number) {
-  if (val === 1) return '#c0c1ff';
-  if (val === 0.5) return '#8083ff';
-  return '#131b2e';
+  if (val === 1) return 'var(--color-primary)';
+  if (val === 0.5) return 'var(--color-primary-container)';
+  return 'var(--color-surface-container-low)';
 }
 
 export default function CharacterTimeline() {
@@ -29,29 +29,29 @@ export default function CharacterTimeline() {
         <div className="max-w-6xl mx-auto space-y-12">
           {/* Header */}
           <div>
-            <span className="text-[#c0c1ff] text-xs font-bold uppercase tracking-[0.2em] mb-2 block">Narrative Presence Matrix</span>
-            <h1 className="text-5xl font-body text-[#dae2fd] mb-4">Character Timeline</h1>
-            <p className="text-[#c7c4d7] font-body italic text-lg max-w-xl">Track exactly which characters appear in each chapter of your manuscript.</p>
+            <span className="text-primary text-xs font-bold uppercase tracking-[0.2em] mb-2 block">Narrative Presence Matrix</span>
+            <h1 className="text-5xl font-body text-on-surface mb-4">Character Timeline</h1>
+            <p className="text-on-surface-variant font-body italic text-lg max-w-xl">Track exactly which characters appear in each chapter of your manuscript.</p>
           </div>
 
           {/* Presence Matrix */}
           <motion.div
             initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-            className="bg-[#131b2e] rounded-[2rem] p-8"
+            className="bg-surface-container-low rounded-[2rem] p-8"
           >
             <div className="flex items-center justify-between mb-8">
-              <h3 className="font-headline font-bold text-[#dae2fd]">Presence Matrix</h3>
+              <h3 className="font-headline font-bold text-on-surface">Presence Matrix</h3>
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-sm bg-[#c0c1ff]" />
+                  <div className="w-4 h-4 rounded-sm bg-primary" />
                   <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Present</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-sm bg-[#8083ff]" />
+                  <div className="w-4 h-4 rounded-sm bg-primary-container" />
                   <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Mentioned</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-sm bg-[#131b2e] border border-[#464554]/30" />
+                  <div className="w-4 h-4 rounded-sm bg-surface-container-low border border-outline-variant/30" />
                   <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Absent</span>
                 </div>
               </div>
@@ -71,7 +71,7 @@ export default function CharacterTimeline() {
                   {characters.map((char, ci) => (
                     <tr key={char} className="group">
                       <td className="py-3 pr-6">
-                        <span className="text-sm font-medium text-[#dae2fd] group-hover:text-[#c0c1ff] transition-colors">{char}</span>
+                        <span className="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">{char}</span>
                       </td>
                       {presence[ci].map((val, chi) => (
                         <td key={chi} className="py-3 px-2 text-center">
@@ -95,17 +95,17 @@ export default function CharacterTimeline() {
           {/* Stats Row */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { label: 'Most Active', value: 'Silas Thorne', sub: '7 / 8 Chapters', color: 'text-[#c0c1ff]', icon: 'person' },
+              { label: 'Most Active', value: 'Silas Thorne', sub: '7 / 8 Chapters', color: 'text-primary', icon: 'person' },
               { label: 'Least Active', value: 'The Archivist', sub: '2 / 8 Chapters', color: 'text-slate-400', icon: 'person_off' },
-              { label: 'Scene Without POV', value: 'Chapter 5', sub: 'Silver Man only', color: 'text-[#ffb783]', icon: 'warning' },
+              { label: 'Scene Without POV', value: 'Chapter 5', sub: 'Silver Man only', color: 'text-tertiary', icon: 'warning' },
             ].map((stat, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + i * 0.1 }}
-                className="bg-[#131b2e] rounded-[2rem] p-6 flex items-center gap-4"
+                className="bg-surface-container-low rounded-[2rem] p-6 flex items-center gap-4"
               >
-                <div className="w-12 h-12 rounded-xl bg-[#222a3d] flex items-center justify-center">
-                  <span className="material-symbols-outlined text-[#c0c1ff]">{stat.icon}</span>
+                <div className="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center">
+                  <span className="material-symbols-outlined text-primary">{stat.icon}</span>
                 </div>
                 <div>
                   <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">{stat.label}</p>

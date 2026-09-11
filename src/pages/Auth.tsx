@@ -57,12 +57,12 @@ export default function Auth() {
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-[#0b1326] flex items-center justify-center p-4 overflow-hidden font-sans">
+    <div className="relative min-h-screen w-full bg-surface flex items-center justify-center p-4 overflow-hidden font-sans">
       {/* Dynamic Background Effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-[#8083ff]/20 blur-[120px] mix-blend-screen" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-[#d97721]/10 blur-[120px] mix-blend-screen" />
-        <div className="absolute top-[20%] right-[10%] w-[20%] h-[20%] rounded-full bg-[#494bd6]/10 blur-[80px] mix-blend-screen" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary-container/20 blur-[120px] mix-blend-screen" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-tertiary-container/10 blur-[120px] mix-blend-screen" />
+        <div className="absolute top-[20%] right-[10%] w-[20%] h-[20%] rounded-full bg-inverse-primary/10 blur-[80px] mix-blend-screen" />
         <div className="noise-overlay absolute inset-0 opacity-[0.03]" />
       </div>
 
@@ -76,7 +76,7 @@ export default function Auth() {
           className="relative w-full max-w-[420px]"
         >
           {/* Glass Card */}
-          <div className="relative z-10 bg-[#131b2e]/60 backdrop-blur-2xl border border-white/5 rounded-3xl p-8 sm:p-10 shadow-2xl shadow-black/50">
+          <div className="relative z-10 bg-surface-container-low/60 backdrop-blur-2xl border border-white/5 rounded-3xl p-8 sm:p-10 shadow-2xl shadow-black/50">
             
             {/* Logo / Header */}
             <div className="flex flex-col items-center mb-10 text-center">
@@ -84,14 +84,14 @@ export default function Auth() {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.1 }}
-                className="w-14 h-14 bg-gradient-to-br from-[#c0c1ff] to-[#8083ff] rounded-2xl flex items-center justify-center shadow-lg shadow-[#8083ff]/20 mb-6"
+                className="w-14 h-14 bg-gradient-to-br from-primary to-primary-container rounded-2xl flex items-center justify-center shadow-lg shadow-primary-container/20 mb-6"
               >
-                <div className="w-6 h-6 border-2 border-[#1000a9] rounded-sm transform rotate-45" />
+                <div className="w-6 h-6 border-2 border-on-primary rounded-sm transform rotate-45" />
               </motion.div>
-              <h1 className="text-3xl font-semibold text-[#dae2fd] tracking-tight mb-2">
+              <h1 className="text-3xl font-semibold text-on-surface tracking-tight mb-2">
                 {mode === 'signup' ? 'Join Pro Writers' : mode === 'forgot' ? 'Reset Password' : 'Welcome back'}
               </h1>
-              <p className="text-[#c7c4d7]/70 text-sm">
+              <p className="text-on-surface-variant/70 text-sm">
                 {mode === 'signup' 
                   ? 'Craft your world with professional tools.' 
                   : mode === 'forgot'
@@ -112,7 +112,7 @@ export default function Auth() {
                   <div className={`p-4 rounded-xl flex items-start gap-3 border backdrop-blur-sm ${
                     message.type === 'success' 
                       ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20' 
-                      : 'bg-[#ffb4ab]/10 text-[#ffb4ab] border-[#ffb4ab]/20'
+                      : 'bg-error/10 text-error border-error/20'
                   }`}>
                     <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
                     <p className="text-sm leading-relaxed">{message.text}</p>
@@ -123,11 +123,11 @@ export default function Auth() {
 
             <form onSubmit={handleAuth} className="space-y-5">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-[#c7c4d7]/80 uppercase tracking-wider ml-1">
+                <label className="text-xs font-medium text-on-surface-variant/80 uppercase tracking-wider ml-1">
                   Email
                 </label>
                 <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#908fa0] group-focus-within:text-[#c0c1ff] transition-colors">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline group-focus-within:text-primary transition-colors">
                     <Mail className="w-5 h-5" />
                   </div>
                   <input
@@ -136,18 +136,18 @@ export default function Auth() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@example.com"
                     required
-                    className="w-full pl-11 pr-4 py-3.5 bg-[#060e20]/50 border border-white/5 rounded-2xl text-[#dae2fd] placeholder-[#908fa0]/50 focus:outline-none focus:ring-2 focus:ring-[#8083ff]/50 focus:bg-[#060e20]/80 transition-all duration-300"
+                    className="w-full pl-11 pr-4 py-3.5 bg-surface-container-lowest/50 border border-white/5 rounded-2xl text-on-surface placeholder-outline/50 focus:outline-none focus:ring-2 focus:ring-primary-container/50 focus:bg-surface-container-lowest/80 transition-all duration-300"
                   />
                 </div>
               </div>
 
               {mode === 'signup' && (
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-[#c7c4d7]/80 uppercase tracking-wider ml-1">
+                  <label className="text-xs font-medium text-on-surface-variant/80 uppercase tracking-wider ml-1">
                     Name
                   </label>
                   <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#908fa0] group-focus-within:text-[#c0c1ff] transition-colors">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline group-focus-within:text-primary transition-colors">
                       <User className="w-5 h-5" />
                     </div>
                     <input
@@ -156,7 +156,7 @@ export default function Auth() {
                       onChange={(e) => setName(e.target.value)}
                       placeholder="John Doe"
                       required
-                      className="w-full pl-11 pr-4 py-3.5 bg-[#060e20]/50 border border-white/5 rounded-2xl text-[#dae2fd] placeholder-[#908fa0]/50 focus:outline-none focus:ring-2 focus:ring-[#8083ff]/50 focus:bg-[#060e20]/80 transition-all duration-300"
+                      className="w-full pl-11 pr-4 py-3.5 bg-surface-container-lowest/50 border border-white/5 rounded-2xl text-on-surface placeholder-outline/50 focus:outline-none focus:ring-2 focus:ring-primary-container/50 focus:bg-surface-container-lowest/80 transition-all duration-300"
                     />
                   </div>
                 </div>
@@ -164,20 +164,20 @@ export default function Auth() {
 
               {mode !== 'forgot' && (
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-[#c7c4d7]/80 uppercase tracking-wider ml-1 flex justify-between">
+                  <label className="text-xs font-medium text-on-surface-variant/80 uppercase tracking-wider ml-1 flex justify-between">
                     <span>Password</span>
                     {mode === 'signin' && (
                       <button 
                         type="button"
                         onClick={() => { setMode('forgot'); setMessage(null); }}
-                        className="text-[#8083ff] hover:text-[#c0c1ff] transition-colors normal-case tracking-normal"
+                        className="text-primary-container hover:text-primary transition-colors normal-case tracking-normal"
                       >
                         Forgot?
                       </button>
                     )}
                   </label>
                   <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#908fa0] group-focus-within:text-[#c0c1ff] transition-colors">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline group-focus-within:text-primary transition-colors">
                       <Lock className="w-5 h-5" />
                     </div>
                     <input
@@ -187,12 +187,12 @@ export default function Auth() {
                       placeholder="••••••••"
                       required
                       minLength={6}
-                      className="w-full pl-11 pr-12 py-3.5 bg-[#060e20]/50 border border-white/5 rounded-2xl text-[#dae2fd] placeholder-[#908fa0]/50 focus:outline-none focus:ring-2 focus:ring-[#8083ff]/50 focus:bg-[#060e20]/80 transition-all duration-300"
+                      className="w-full pl-11 pr-12 py-3.5 bg-surface-container-lowest/50 border border-white/5 rounded-2xl text-on-surface placeholder-outline/50 focus:outline-none focus:ring-2 focus:ring-primary-container/50 focus:bg-surface-container-lowest/80 transition-all duration-300"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-[#908fa0] hover:text-[#c0c1ff] transition-colors"
+                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-outline hover:text-primary transition-colors"
                     >
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
@@ -205,13 +205,13 @@ export default function Auth() {
                 whileTap={{ scale: 0.99 }}
                 type="submit"
                 disabled={loading || !email || (mode !== 'forgot' && !password)}
-                className="group relative w-full h-12 bg-gradient-to-r from-[#8083ff] to-[#494bd6] hover:from-[#c0c1ff] hover:to-[#8083ff] text-white font-medium rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2 shadow-lg shadow-[#494bd6]/20 overflow-hidden"
+                className="group relative w-full h-12 bg-gradient-to-r from-primary-container to-inverse-primary hover:from-primary hover:to-primary-container text-white font-medium rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2 shadow-lg shadow-inverse-primary/20 overflow-hidden"
               >
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
                 {loading ? (
-                  <Loader2 className="w-5 h-5 animate-spin relative z-10 text-[#07006c]" />
+                  <Loader2 className="w-5 h-5 animate-spin relative z-10 text-on-primary-fixed" />
                 ) : (
-                  <span className="relative z-10 flex items-center gap-2 text-[#07006c] font-semibold">
+                  <span className="relative z-10 flex items-center gap-2 text-on-primary-fixed font-semibold">
                     {mode === 'signup' ? 'Create Account' : mode === 'forgot' ? 'Send Reset Link' : 'Sign In'}
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </span>
@@ -219,12 +219,12 @@ export default function Auth() {
               </motion.button>
             </form>
 
-            <div className="mt-8 text-center text-sm text-[#908fa0]">
+            <div className="mt-8 text-center text-sm text-outline">
               {mode === 'signup' ? 'Already have an account? ' : mode === 'forgot' ? 'Remember your password? ' : "Don't have an account? "}
               <button 
                 type="button" 
                 onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setMessage(null); }}
-                className="text-[#dae2fd] hover:text-[#c0c1ff] font-medium transition-colors border-b border-[#dae2fd]/30 hover:border-[#c0c1ff] pb-0.5"
+                className="text-on-surface hover:text-primary font-medium transition-colors border-b border-on-surface/30 hover:border-primary pb-0.5"
               >
                 {mode === 'signup' ? 'Sign In' : mode === 'forgot' ? 'Back to Sign In' : 'Create one'}
               </button>

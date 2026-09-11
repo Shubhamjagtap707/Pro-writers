@@ -35,7 +35,7 @@ function SortableSceneCard({ scene, startEdit, deleteScene, editingId, editTitle
     <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="mb-4 touch-none group/scene">
       <motion.div
         whileHover={{ scale: 1.01 }}
-        className="bg-[#131b2e] p-6 rounded-xl hover:bg-[#222a3d] transition-all cursor-grab border border-[#464554]/10 shadow-lg relative"
+        className="bg-surface-container-low p-6 rounded-xl hover:bg-surface-container-high transition-all cursor-grab border border-outline-variant/10 shadow-lg relative"
       >
         <div className="flex justify-between items-start mb-2">
           {editingId === scene.id ? (
@@ -46,12 +46,12 @@ function SortableSceneCard({ scene, startEdit, deleteScene, editingId, editTitle
               onBlur={() => submitEdit(scene.id, false)}
               onKeyDown={e => e.key === 'Enter' && submitEdit(scene.id, false)}
               onPointerDown={e => e.stopPropagation()} // Prevent drag when focusing input
-              className="bg-transparent border-b border-[#c0c1ff] outline-none text-[#dae2fd] text-lg font-body truncate w-[80%]"
+              className="bg-transparent border-b border-primary outline-none text-on-surface text-lg font-body truncate w-[80%]"
             />
           ) : (
             <h3
               onDoubleClick={(e) => { e.stopPropagation(); startEdit(scene.id, scene.title); }}
-              className="font-body text-lg text-[#dae2fd] truncate pr-4 cursor-text"
+              className="font-body text-lg text-on-surface truncate pr-4 cursor-text"
             >
               {scene.title}
             </h3>
@@ -69,7 +69,7 @@ function SortableSceneCard({ scene, startEdit, deleteScene, editingId, editTitle
         </div>
         <textarea
           onPointerDown={e => e.stopPropagation()}
-          className="w-full bg-transparent font-body text-sm text-slate-400 placeholder-slate-600 leading-relaxed mb-4 outline-none resize-none border border-transparent focus:border-[#464554]/30 focus:bg-[#0b1326]/50 rounded-lg p-2 -ml-2 transition-all transition-colors no-scrollbar"
+          className="w-full bg-transparent font-body text-sm text-slate-400 placeholder-slate-600 leading-relaxed mb-4 outline-none resize-none border border-transparent focus:border-outline-variant/30 focus:bg-surface/50 rounded-lg p-2 -ml-2 transition-all transition-colors no-scrollbar"
           rows={3}
           value={scene.notes || ''}
           onChange={(e) => updateSceneNotes(scene.id, e.target.value)}
@@ -137,12 +137,12 @@ function SortableChapterColumn({
               onBlur={() => submitEdit(chapter.id, true)}
               onKeyDown={e => e.key === 'Enter' && submitEdit(chapter.id, true)}
               onPointerDown={e => e.stopPropagation()}
-              className="bg-transparent border-b border-[#c0c1ff] outline-none text-[#dae2fd] text-2xl font-body w-full mt-1"
+              className="bg-transparent border-b border-primary outline-none text-on-surface text-2xl font-body w-full mt-1"
             />
           ) : (
             <h2
               onDoubleClick={(e) => { e.stopPropagation(); startEdit(chapter.id, chapter.title); }}
-              className="font-body text-2xl text-[#dae2fd] cursor-text mt-1"
+              className="font-body text-2xl text-on-surface cursor-text mt-1"
             >
               {chapter.title}
             </h2>
@@ -179,7 +179,7 @@ function SortableChapterColumn({
           ))}
 
           {scenes.length === 0 && (
-            <div className="h-32 border-2 border-dashed border-[#464554]/10 rounded-xl flex items-center justify-center text-slate-600 font-label text-xs uppercase tracking-widest opacity-50 pointer-events-none">
+            <div className="h-32 border-2 border-dashed border-outline-variant/10 rounded-xl flex items-center justify-center text-slate-600 font-label text-xs uppercase tracking-widest opacity-50 pointer-events-none">
               Empty Chapter
             </div>
           )}
@@ -187,7 +187,7 @@ function SortableChapterColumn({
 
         <button
           onClick={() => activeProjectId && createScene(chapter.id, activeProjectId)}
-          className="w-full mt-4 py-4 border-2 border-dashed border-[#464554]/10 rounded-xl text-slate-600 hover:text-slate-400 hover:border-[#c0c1ff]/30 transition-all flex items-center justify-center gap-2"
+          className="w-full mt-4 py-4 border-2 border-dashed border-outline-variant/10 rounded-xl text-slate-600 hover:text-slate-400 hover:border-primary/30 transition-all flex items-center justify-center gap-2"
         >
           <span className="material-symbols-outlined">add_circle</span>
           <span className="text-xs uppercase font-bold tracking-widest">Append Scene</span>
@@ -270,7 +270,7 @@ export default function Outliner() {
   };
 
   return (
-    <div className="page-shell bg-[#080d19]">
+    <div className="page-shell bg-surface">
       <div className="fixed inset-0 noise-overlay pointer-events-none z-10" />
 
       {/* Kanban Board */}
@@ -308,7 +308,7 @@ export default function Outliner() {
             {/* New Act Button */}
             <button
               onClick={() => activeProjectId && createChapter(activeProjectId)}
-              className="w-80 flex-shrink-0 border-2 border-dashed border-[#464554]/5 rounded-2xl flex flex-col items-center justify-center text-slate-700 hover:text-[#c0c1ff] hover:border-[#c0c1ff]/20 hover:bg-[#131b2e] transition-all"
+              className="w-80 flex-shrink-0 border-2 border-dashed border-outline-variant/5 rounded-2xl flex flex-col items-center justify-center text-slate-700 hover:text-primary hover:border-primary/20 hover:bg-surface-container-low transition-all"
               style={{ height: 200 }}
             >
               <span className="material-symbols-outlined text-4xl mb-2">low_priority</span>
@@ -320,23 +320,23 @@ export default function Outliner() {
       </div>
 
       {/* Footer status bar */}
-      <footer className="h-14 bg-[#131b2e]/80 backdrop-blur-md flex items-center justify-between px-12 border-t border-[#464554]/5 flex-shrink-0 z-40">
+      <footer className="h-14 bg-surface-container-low/80 backdrop-blur-md flex items-center justify-between px-12 border-t border-outline-variant/5 flex-shrink-0 z-40">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-[#c0c1ff] animate-pulse" />
+            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
             <span className="text-[10px] uppercase font-bold tracking-widest text-slate-400">Autosave Active</span>
           </div>
-          <div className="h-4 w-px bg-[#464554]/20" />
+          <div className="h-4 w-px bg-outline-variant/20" />
           <p className="font-body text-sm text-slate-300 italic">"The ink is just the blood of the imagination..."</p>
         </div>
         <div className="flex items-center gap-8">
           <div className="flex flex-col items-end">
             <span className="text-[10px] font-label text-slate-500 uppercase tracking-tighter">Total Word Count</span>
-            <span className="font-body text-lg leading-none text-[#c0c1ff]">{totalWords.toLocaleString()}</span>
+            <span className="font-body text-lg leading-none text-primary">{totalWords.toLocaleString()}</span>
           </div>
           <div className="flex flex-col items-end">
             <span className="text-[10px] font-label text-slate-500 uppercase tracking-tighter">Chapters</span>
-            <span className="font-body text-lg leading-none text-[#ffb783]">{projectChapters.length}</span>
+            <span className="font-body text-lg leading-none text-tertiary">{projectChapters.length}</span>
           </div>
         </div>
       </footer>
