@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProjectStore } from '../store/useProjectStore';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -518,7 +518,7 @@ export default function CharacterProfile() {
                   </tr>
                 </thead>
                 <tbody>
-                  {(activeChar.canonChoices || []).map((row, index) => (
+                  {((activeChar.canonChoices as any[]) || []).map((row: any, index: number) => (
                     <tr key={row.id} className="border-b border-outline-variant/5 last:border-0 group transition-colors hover:bg-surface/50">
                       <td className="p-6 align-top border-r border-outline-variant/5">
                         <RichTextEditor readOnly={!isEditMode}

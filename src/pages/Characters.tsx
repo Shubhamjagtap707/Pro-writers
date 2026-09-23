@@ -6,7 +6,7 @@ import { useProjectStore } from '../store/useProjectStore';
 const filters = ['All Figures', 'Protagonists', 'Antagonists', 'NPCs'];
 const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1557682250-33bd709cbe85?auto=format&fit=crop&w=800&q=80';
 
-const stripHtml = (html: string) => {
+const stripHtml = (html?: string) => {
   if (!html) return '';
   const tmp = document.createElement('DIV');
   tmp.innerHTML = html;

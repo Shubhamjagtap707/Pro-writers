@@ -97,7 +97,7 @@ export default function RichTextEditor({ value, onChange, placeholder, readOnly 
   // Sync value if it changes from outside
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
-      editor.commands.setContent(value, false);
+      editor.commands.setContent(value, { emitUpdate: false });
     }
   }, [value, editor]);
 
