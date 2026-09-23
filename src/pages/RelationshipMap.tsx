@@ -52,7 +52,7 @@ export default function RelationshipMap() {
             <div className="w-24 h-24 rounded-full p-1 bg-surface-container-highest group-hover:scale-105 transition-transform"
               style={{ boxShadow: '0 0 20px rgba(192,193,255,0.15)' }}>
               <div className="w-full h-full rounded-full overflow-hidden border-2 border-surface bg-surface-container-low">
-                <img alt="Silver Man" className="w-full h-full object-cover grayscale opacity-80"
+                <img alt="Silver Man" className="w-full h-full object-cover opacity-80"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuARzcNHXq08GeRm1NTZC6agIrsQbYqSalrRh2xAAlPttqbxGgNuoPpHYcPCGa97dO9ClMgNwmSMGjhOAJoOCVi0RDpni-5Klv4SqfK2BvRJoPfxfzwToVbMMaJFYXoQ4CIXOobhKgYmS_lRgDG5v46zDzu18xgWmnGzBZPzgTYVrg52keAfIpeR0rQfNScjoL17RazKb5dyCVlGpGTRcJgmfpXH_5aAO5Y-d5FdKFWdTRJ4DIuG3j0owFhlPHFMfyfwEjYahfirrIlu"
                 />
               </div>

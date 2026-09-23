@@ -1,12 +1,56 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useProjectStore } from '../store/useProjectStore';
 
 const filters = ['All Figures', 'Protagonists', 'Antagonists', 'NPCs'];
+const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1557682250-33bd709cbe85?auto=format&fit=crop&w=800&q=80';
+
+const stripHtml = (html: string) => {
+  if (!html) return '';
+  const tmp = document.createElement('DIV');
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || '';
+};
+
+const ScrollableTitle = ({ text, className }: { text: string, className?: string }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLHeadingElement>(null);
+  const [overflowAmount, setOverflowAmount] = useState(0);
+
+  useEffect(() => {
+    const checkOverflow = () => {
+      if (containerRef.current && textRef.current) {
+        const overflow = textRef.current.scrollWidth - containerRef.current.clientWidth;
+        setOverflowAmount(overflow > 0 ? overflow : 0);
+      }
+    };
+    checkOverflow();
+    window.addEventListener('resize', checkOverflow);
+    return () => window.removeEventListener('resize', checkOverflow);
+  }, [text]);
+
+  return (
+    <div ref={containerRef} className={`overflow-hidden whitespace-nowrap relative ${className}`}>
+      <motion.h3
+        ref={textRef}
+        className="inline-block w-max text-3xl font-body font-bold text-on-surface"
+        animate={overflowAmount > 0 ? { x: [0, -overflowAmount, 0] } : { x: 0 }}
+        transition={overflowAmount > 0 ? { repeat: Infinity, duration: 4 + overflowAmount * 0.02, ease: "linear", repeatDelay: 1 } : {}}
+      >
+        {text}
+      </motion.h3>
+      {overflowAmount > 0 && (
+        <div className="absolute top-0 right-0 bottom-0 w-8 bg-gradient-to-l from-surface-container to-transparent pointer-events-none" />
+      )}
+    </div>
+  );
+};
 
 export default function Characters() {
+  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState('All Figures');
-  const { characters, activeProjectId, projects, createCharacter, deleteCharacter } = useProjectStore();
+  const { characters, activeProjectId, projects, createCharacter, deleteCharacter, updateCharacter } = useProjectStore();
   const activeProject = activeProjectId ? projects[activeProjectId] : null;
   const seriesId = activeProject?.series_id;
 
@@ -15,7 +59,7 @@ export default function Characters() {
     name: '', 
     role: 'Protagonist', 
     archetype: '', 
-    avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80', 
+    avatarUrl: '', 
   });
 
   const projectChars = Object.values(characters).filter(c => 
@@ -39,7 +83,7 @@ export default function Characters() {
       color: newChar.role === 'Protagonist' ? 'text-primary' : newChar.role === 'Antagonist' ? 'text-error' : 'text-tertiary'
     }, seriesId);
     setIsModalOpen(false);
-    setNewChar({ name: '', role: 'Protagonist', archetype: '', avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80' });
+    setNewChar({ name: '', role: 'Protagonist', archetype: '', avatarUrl: '' });
   };
 
   if (!activeProjectId) {
@@ -107,6 +151,15 @@ export default function Characters() {
                     <option>NPCs</option>
                   </select>
                 </div>
+                <div>
+                  <label className="text-[10px] font-label text-slate-500 uppercase tracking-widest mb-2 block">Image URL</label>
+                  <input
+                    value={newChar.avatarUrl}
+                    onChange={e => setNewChar(prev => ({ ...prev, avatarUrl: e.target.value }))}
+                    placeholder="https://..."
+                    className="w-full bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 text-on-surface outline-none focus:border-primary/50 transition-colors"
+                  />
+                </div>
                 
                 <button
                   onClick={handleCreate}
@@ -150,168 +203,7 @@ export default function Characters() {
         {/* Bento Grid layout with original dynamic aesthetic bindings */}
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-8">
 
-          {filteredChars.map((char, index) => {
-            const pattern = index % 5;
-            
-            if (pattern === 0) {
-              return (
-                <motion.div
-                  key={char.id}
-                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-                  className="md:col-span-6 lg:col-span-8 bg-surface-container-low rounded-[2rem] overflow-hidden group cursor-pointer border border-transparent hover:border-primary/10 transition-all duration-300 relative"
-                >
-                  <button onClick={(e) => { e.stopPropagation(); deleteCharacter(char.id); }} className="absolute z-20 right-4 top-4 p-2 bg-black/40 rounded-full text-slate-400 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="material-symbols-outlined text-sm">delete</span>
-                  </button>
-                  <div className="flex flex-col lg:flex-row h-full">
-                    <div className="lg:w-1/2 relative h-80 lg:h-auto overflow-hidden">
-                      <img
-                        alt={char.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        src={char.avatarUrl}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-surface-container-low via-transparent to-transparent" />
-                      <div className="absolute bottom-6 left-6 flex gap-2">
-                        <span className="px-3 py-1 rounded-full bg-primary/20 backdrop-blur-md text-primary text-[10px] font-bold uppercase tracking-widest border border-primary/20">{char.role}</span>
-                      </div>
-                    </div>
-                    <div className="p-8 lg:w-1/2 flex flex-col justify-center">
-                      <span className="text-primary font-label text-xs uppercase tracking-[0.2em] mb-2 block">{char.archetype}</span>
-                      <h3 className="text-3xl font-body font-bold mb-4 text-on-surface">{char.name}</h3>
-                      <p className="text-on-surface-variant font-body italic mb-6 leading-relaxed">A core figure locked inside the narrative framework of your manuscript.</p>
-                      <div className="space-y-3">
-                        {[
-                          { label: 'Role', value: char.role },
-                          { label: 'Archetype', value: char.archetype || 'Unknown' },
-                        ].map(item => (
-                          <div key={item.label} className="flex items-center justify-between py-2 border-b border-outline-variant/10 last:border-0">
-                            <span className="text-xs font-label text-slate-500 uppercase tracking-widest">{item.label}</span>
-                            <span className="text-sm font-body text-on-surface">{item.value}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            }
-
-            if (pattern === 1) {
-              return (
-                <motion.div
-                  key={char.id}
-                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                  className="md:col-span-3 lg:col-span-4 bg-surface-container rounded-[2rem] p-6 flex flex-col border border-transparent hover:border-error/20 transition-all duration-300 cursor-pointer group relative"
-                >
-                  <button onClick={(e) => { e.stopPropagation(); deleteCharacter(char.id); }} className="absolute z-20 right-8 top-8 p-2 bg-black/40 rounded-full text-slate-400 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="material-symbols-outlined text-sm">delete</span>
-                  </button>
-                  <div className="w-full aspect-square rounded-2xl overflow-hidden mb-6 relative">
-                    <img
-                      alt={char.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      src={char.avatarUrl}
-                    />
-                    <div className="absolute top-4 right-4">
-                      <span className="bg-error-container/40 backdrop-blur-md text-error text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">{char.role}</span>
-                    </div>
-                  </div>
-                  <h3 className="text-2xl font-body font-bold text-on-surface">{char.name}</h3>
-                  <p className="text-slate-500 text-sm font-label mb-4 tracking-wide">{char.archetype}</p>
-                </motion.div>
-              );
-            }
-
-            if (pattern === 2) {
-              return (
-                <motion.div
-                  key={char.id}
-                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-                  className="md:col-span-3 lg:col-span-4 bg-surface-container-low rounded-[2rem] p-6 border border-transparent hover:border-tertiary/20 transition-all duration-300 cursor-pointer group relative"
-                >
-                  <button onClick={(e) => { e.stopPropagation(); deleteCharacter(char.id); }} className="absolute z-20 right-8 top-8 p-2 bg-black/40 rounded-full text-slate-400 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="material-symbols-outlined text-sm">delete</span>
-                  </button>
-                  <div className="w-full h-48 rounded-2xl overflow-hidden mb-6 relative">
-                    <img
-                      alt={char.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      src={char.avatarUrl}
-                    />
-                  </div>
-                  <h3 className="text-2xl font-body font-bold text-on-surface">{char.name}</h3>
-                  <p className="text-slate-500 text-sm font-label mb-4 tracking-wide">{char.role}</p>
-                  <div className="p-4 bg-tertiary/10 rounded-xl border border-tertiary/10">
-                    <p className="text-xs font-body italic text-tertiary">"{char.archetype} dynamics deployed within narrative."</p>
-                  </div>
-                </motion.div>
-              );
-            }
-
-            if (pattern === 3) {
-              return (
-                <motion.div
-                  key={char.id}
-                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                  className="md:col-span-3 lg:col-span-4 bg-surface-container rounded-[2rem] p-6 border border-transparent hover:border-primary/20 transition-all duration-300 cursor-pointer group relative"
-                >
-                  <button onClick={(e) => { e.stopPropagation(); deleteCharacter(char.id); }} className="absolute z-20 right-6 top-6 p-2 bg-black/40 rounded-full text-slate-400 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="material-symbols-outlined text-sm">delete</span>
-                  </button>
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-primary/20 shrink-0">
-                      <img
-                        alt={char.name}
-                        className="w-full h-full object-cover"
-                        src={char.avatarUrl}
-                      />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-body font-bold text-on-surface">{char.name}</h3>
-                      <p className="text-xs text-slate-500 font-label tracking-widest uppercase">{char.archetype}</p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 mb-6">
-                    {[{ label: 'Role', value: char.role }, { label: 'Status', value: 'Active' }].map(item => (
-                      <div key={item.label} className="p-3 bg-surface-container-high rounded-xl">
-                        <span className="block text-[10px] text-slate-500 font-label uppercase tracking-widest mb-1">{item.label}</span>
-                        <span className={`text-xs ${item.label === 'Status' ? 'text-secondary' : 'text-on-surface'}`}>{item.value}</span>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              );
-            }
-
-            return (
-              <motion.div
-                key={char.id}
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-                className="md:col-span-3 lg:col-span-4 bg-surface-container rounded-[2rem] overflow-hidden relative group cursor-pointer border border-transparent hover:border-secondary/20 transition-all duration-300"
-                style={{ minHeight: 280 }}
-              >
-                <button onClick={(e) => { e.stopPropagation(); deleteCharacter(char.id); }} className="absolute z-20 left-4 top-4 p-2 bg-black/40 rounded-full text-slate-400 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className="material-symbols-outlined text-sm">delete</span>
-                </button>
-                <img
-                  alt={char.name}
-                  className="w-full h-full object-cover opacity-50 group-hover:scale-105 transition-all duration-700 absolute inset-0"
-                  src={char.avatarUrl}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/60 to-transparent" />
-                <div className="absolute bottom-0 left-0 p-8 w-full">
-                  <span className="text-secondary font-label text-[10px] uppercase tracking-[0.3em] mb-1 block">Role: {char.role}</span>
-                  <h3 className="text-3xl font-body font-bold text-on-surface mb-2">{char.name}</h3>
-                  <div className="flex items-center gap-2 text-slate-400 text-xs">
-                    <span className="material-symbols-outlined text-sm">visibility_off</span>
-                    <span className="font-label tracking-wide">{char.archetype}</span>
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
-
-          {/* New Character Spawn Button added dynamically at the end */}
+          {/* New Character Spawn Button (Fixed Position at Top) */}
           <motion.div
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
             onClick={() => setIsModalOpen(true)}
@@ -323,6 +215,82 @@ export default function Characters() {
             </div>
             <p className="font-headline text-[11px] uppercase tracking-widest text-slate-500 group-hover:text-on-surface transition-colors">Spawn Character</p>
           </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            onClick={() => {
+              if (!activeProjectId) return;
+              const charId = createCharacter(activeProjectId, {
+                name: 'Aeron Stormbreaker',
+                role: 'Protagonist',
+                archetype: 'Reluctant King',
+                avatarUrl: 'https://images.unsplash.com/photo-1629853381665-27a9223e7179?q=80&w=800&auto=format&fit=crop',
+                color: 'text-primary'
+              }, seriesId);
+              
+              updateCharacter(charId, {
+                appearance: 'Tall, broad-shouldered, and rugged — with storm-grey eyes that flash like lightning when angered or inspired. His dark brown hair, streaked faintly with silver after surviving a lightning strike, mirrors the storms that define him. A faint scar along his jaw marks his first true battle. His armor is plain and practical, bearing his personal sigil: a shattered thunderbolt.',
+                personality: 'Stoic, introspective, fiercely independent.\nCalm under pressure; storm-like when provoked.\nBelieves power must be earned — leadership is service, not privilege.\nEmpathetic to the oppressed; despises tyranny and deceit.\nDistrusts politics, preferring honesty and action.\nHaunted by guilt over lives lost under his command.\nSpeaks little but observes deeply — his silence inspires fear and loyalty alike.\nCarries quiet melancholy — a heart shaped by loss and love.',
+                background: 'Aeron’s beginnings are shrouded in mystery. He was found as an infant near the ruins of an ancient temple during a thunderstorm — crying beneath the open sky. Beside him lay a rusted pendant engraved with a forgotten symbol, a relic no scholar could decipher.\n\nHe grew up among orphans and war camps, surviving by instinct and endurance. No record names his parents; no noble house claims him. Raised by wanderers, soldiers, and mercenaries in the wild lands beyond the eastern borders, Aeron learned early that the world only respects strength and resolve.',
+                internalConflict: 'Aeron’s greatest war is within himself.\nHe craves freedom, yet destiny binds him to rule. Every step toward leadership feels like another chain on his soul. Though he never sought a crown, he cannot turn away from those who need him.',
+                externalConflict: 'The tension between his desire for freedom and the external pressure to unite the kingdoms, facing rivals like King Aelric Velarys who believe in bloodline over merit, and Commander Selene Ironwing who distrusts his instinctive leadership.',
+                weaponsAndSkills: 'Stormbreaker Blade: Forged from meteor-steel and tempered in lightning; hums faintly when danger nears.\nBattle Instincts: Master strategist known for unorthodox tactics — “feels” storms before they break.\nLeadership: Inspires unity among soldiers of rival banners; commands through respect, not fear.\nDiplomacy: Learned through hardship, not heritage — can calm kings and lead commoners alike.\nHorsemanship & Swordsmanship: Exceptional rider and close-combat fighter.',
+                themes: 'Love and Loss: Through Elara and Lyra, Aeron experiences both the beauty and pain of love.\nFreedom vs. Duty: His greatest struggle — to remain himself while bearing the weight of a kingdom.\nStrength and Compassion: He learns that true leadership lies not in domination but in empathy.\nDestiny and Free Will: Though fate crowns him king, it is his choices that make him worthy of the throne.\nLegacy of Peace: His rule ends the age of kings born by blood — beginning one ruled by merit.',
+                connections: 'Lady Elara Stormveil (First Love): She taught him how to feel before the world taught him how to endure. Represents innocence and heart.\n\nLady Lyra Faelin (Second Love): Healer with empathic magic. Represents healing, balance, and redemption. Separated by destiny.\n\nKing Aelric Velarys: A proud monarch who once allied with Aeron, now a rival.\n\nGeneral Cailen Stormrider: A rival-turned-mentor.\n\nCommander Selene Ironwing: A disciplined commander.\n\nReygar the Bold: A free-spirited warrior and truest friend.\n\nNerissa the Wanderer: A mystical nomad.',
+                roleInStory: 'Rises as a reluctant king who unites the seven kingdoms under one banner. His rule marks the dawn of a new era built on fairness, strength, and humility. The man who never sought power, but became power itself.',
+                timeline: 'Infant: Found near ruins of an ancient temple during a thunderstorm.\n\nSeventeen: Fought in the war between Velarys and Eldoria.\n\nEarly life: Wandering mercenary, saved a village during the Great Tempest of the Shattered Coast.\n\nLater life: Becomes the Last King of the Seven Kingdoms.',
+                canonChoices: [
+                  { id: crypto.randomUUID(), element: 'First Love', choice: 'Lady Elara Stormveil — gentle, pure, dies of incurable illness' },
+                  { id: crypto.randomUUID(), element: 'Second Love', choice: 'Lady Lyra Faelin — healer with magic, deep emotional bond, separated by destiny (will they meet again?)' },
+                  { id: crypto.randomUUID(), element: 'Greatest Conflict', choice: 'Freedom vs. Duty' },
+                  { id: crypto.randomUUID(), element: 'Theme', choice: 'Healing after loss, reluctant destiny, compassion as strength' },
+                  { id: crypto.randomUUID(), element: 'Fate', choice: 'Becomes the Last King of the Seven Kingdoms — unites them under peace and justice' }
+                ]
+              });
+            }}
+            className="md:col-span-3 lg:col-span-4 rounded-[2rem] border-2 border-dashed border-primary/30 flex flex-col items-center justify-center p-8 hover:border-primary/80 hover:bg-primary/5 transition-colors cursor-pointer group"
+            style={{ minHeight: 280 }}
+          >
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+              <span className="material-symbols-outlined text-primary">download</span>
+            </div>
+            <p className="font-headline text-[11px] uppercase tracking-widest text-primary text-center">Load Aeron Stormbreaker (Test)</p>
+          </motion.div>
+
+
+          {filteredChars.map((char, index) => {
+            return (
+              <motion.div
+                key={char.id}
+                onClick={() => activeProject && navigate(`/${activeProject.slug}/characters/${char.id}`)}
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}
+                className="col-span-12 lg:col-span-6 bg-surface-container rounded-[2rem] overflow-hidden group cursor-pointer border border-transparent hover:border-primary/10 transition-all duration-300 relative flex flex-row h-56"
+              >
+                <div className="w-2/5 relative h-full overflow-hidden shrink-0">
+                  <img
+                    alt={char.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    src={char.avatarUrl || DEFAULT_AVATAR}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-surface-container" />
+                </div>
+                <div className="w-3/5 p-8 flex flex-col justify-center relative">
+                  <button onClick={(e) => { e.stopPropagation(); deleteCharacter(char.id); }} className="absolute z-20 right-6 top-6 p-2 bg-surface hover:bg-red-500/10 rounded-full text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                    <span className="material-symbols-outlined text-sm">delete</span>
+                  </button>
+                  <span className={`font-label text-[10px] uppercase tracking-[0.3em] mb-2 block ${char.color || 'text-primary'}`}>{char.role}</span>
+                  <ScrollableTitle text={char.name} className="mb-2" />
+                  <p className="text-slate-500 font-label text-xs tracking-widest uppercase mb-4 truncate">{char.archetype || 'Unknown Archetype'}</p>
+                  
+                  <p className="text-slate-400 font-body text-sm line-clamp-2 leading-relaxed">
+                    {stripHtml(char.roleInStory) || stripHtml(char.background) || stripHtml(char.personality) || "Profile incomplete. Awaiting psychological manifestation."}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
+
+          {/* Removed buttons from bottom to top */}
           
         </div>
       </div>

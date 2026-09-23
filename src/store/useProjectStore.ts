@@ -17,6 +17,7 @@ interface ProjectState {
   createSeries: (title: string) => string;
   renameProject: (id: string, newTitle: string) => void;
   updateProjectGenre: (id: string, newGenre: string) => void;
+  updateProjectSeries: (id: string, seriesId: string | undefined) => void;
   deleteProject: (id: string) => void;
   deleteSeries: (id: string) => void;
   createChapter: (projectId: string) => void;
@@ -29,7 +30,8 @@ interface ProjectState {
   reorderChapters: (projectId: string, activeId: string, overId: string) => void;
   updateSceneContent: (sceneId: string, content: string) => void;
   updateSceneNotes: (sceneId: string, notes: string) => void;
-  createCharacter: (project_id: string, char: Omit<Character, 'id' | 'project_id' | 'series_id'>, seriesId?: string) => void;
+  createCharacter: (project_id: string, char: Omit<Character, 'id' | 'project_id' | 'series_id'>, seriesId?: string) => string;
+  updateCharacter: (id: string, updates: Partial<Character>) => void;
   deleteCharacter: (id: string) => void;
   createWorldItem: (project_id: string, item: Omit<WorldItem, 'id' | 'project_id' | 'series_id'>, seriesId?: string) => void;
   deleteWorldItem: (id: string) => void;
@@ -167,6 +169,17 @@ export const useProjectStore = create<ProjectState>()(
           projects: {
             ...state.projects,
             [id]: { ...project, genre: newGenre, last_edited_at: new Date().toISOString() },
+          }
+        };
+      }),
+
+      updateProjectSeries: (id, seriesId) => set(state => {
+        const project = state.projects[id];
+        if (!project) return state;
+        return {
+          projects: {
+            ...state.projects,
+            [id]: { ...project, series_id: seriesId, last_edited_at: new Date().toISOString() },
           }
         };
       }),
@@ -312,9 +325,23 @@ export const useProjectStore = create<ProjectState>()(
         return { chapters: nextChapters };
       }),
 
-      createCharacter: (projectId, char, seriesId) => set(state => {
+      createCharacter: (projectId, char, seriesId) => {
         const id = crypto.randomUUID();
-        return { characters: { ...state.characters, [id]: { ...char, id, project_id: projectId, series_id: seriesId } } };
+        set(state => ({
+          characters: { ...state.characters, [id]: { ...char, id, project_id: projectId, series_id: seriesId } }
+        }));
+        return id;
+      },
+
+      updateCharacter: (id, updates) => set(state => {
+        const character = state.characters[id];
+        if (!character) return state;
+        return {
+          characters: {
+            ...state.characters,
+            [id]: { ...character, ...updates }
+          }
+        };
       }),
 
       deleteCharacter: (id) => set(state => {

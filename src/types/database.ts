@@ -43,6 +43,23 @@ export interface Character {
   archetype: string;
   avatarUrl: string;
   color: string;
+  // Detailed attributes
+  titles?: { id: string; title: string }[];
+  background?: string;
+  appearance?: string;
+  personality?: string;
+  quirksAndFlaws?: string;
+  internalConflict?: string;
+  externalConflict?: string;
+  weaponsAndSkills?: string;
+  roleInStory?: string;
+  themes?: string;
+  timeline?: string;
+  fateAndLegacy?: string;
+  connections?: string;
+  relationshipArcs?: { id: string; content: string }[];
+  otherRelationships?: string;
+  canonChoices?: { id: string; element: string; choice: string }[];
 }
 
 export interface WorldItem {

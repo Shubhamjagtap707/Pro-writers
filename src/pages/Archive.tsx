@@ -84,7 +84,7 @@ export default function Archive() {
               className="bg-surface-container-low rounded-[2rem] overflow-hidden group cursor-pointer border border-transparent hover:border-primary/20 transition-all duration-300"
             >
               <div className="h-48 overflow-hidden relative">
-                <img className="w-full h-full object-cover opacity-50 grayscale group-hover:opacity-70 group-hover:grayscale-0 transition-all duration-700"
+                <img className="w-full h-full object-cover opacity-50 group-hover:opacity-70 transition-all duration-700"
                   src={project.img} alt={project.title} />
                 <div className="absolute inset-0 bg-gradient-to-t from-surface-container-low via-transparent to-transparent" />
                 <div className="absolute top-4 right-4">

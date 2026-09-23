@@ -29,7 +29,12 @@ const toolsNav: NavItem[] = [
 
 const sidebarVariants = {
   hidden: { x: -24, opacity: 0, width: 0 },
-  visible: { x: 0, opacity: 1, width: 256, transition: { duration: 0.4, ease: [0, 0, 0.2, 1] as any } },
+  visible: (isMinimized: boolean) => ({ 
+    x: 0, 
+    opacity: 1, 
+    width: isMinimized ? 88 : 256, 
+    transition: { duration: 0.4, ease: [0, 0, 0.2, 1] as any } 
+  }),
   exit: { x: -24, opacity: 0, width: 0, transition: { duration: 0.2 } },
 };
 
@@ -40,9 +45,10 @@ export default function ProjectSidebar() {
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editTitle, setEditTitle] = useState('');
+  const [isMinimized, setIsMinimized] = useState(false);
   
   const startEdit = () => {
-    if (!activeProject) return;
+    if (!activeProject || isMinimized) return;
     setEditTitle(activeProject.title);
     setIsEditingTitle(true);
   };
@@ -57,62 +63,65 @@ export default function ProjectSidebar() {
 
   if (!activeProject) return null;
 
-  if (!activeProject) return null;
-
   return (
     <motion.aside
+      custom={isMinimized}
       variants={sidebarVariants}
       initial="hidden"
       animate="visible"
       exit="exit"
-      className="h-screen flex flex-col py-8 px-6 bg-surface-container-low z-40 rounded-r-3xl overflow-hidden shrink-0 border-r border-surface-container/50"
+      className="h-screen flex flex-col py-8 bg-surface-container-low z-40 rounded-r-3xl overflow-hidden shrink-0 border-r border-surface-container/50 relative"
     >
       {/* Project Header */}
-      <div className="mb-8 relative">
+      <div className={`mb-8 relative px-6 flex flex-col ${isMinimized ? 'items-center' : ''}`}>
         <button 
           onClick={() => { setActiveProject(null); navigate('/'); }}
-          className="absolute -top-4 -left-2 p-2 text-slate-500 hover:text-primary transition-colors flex items-center justify-center rounded-full hover:bg-surface-container"
+          className={`text-slate-500 hover:text-primary transition-colors flex items-center justify-center rounded-full hover:bg-surface-container ${isMinimized ? 'p-3' : 'absolute -top-4 -left-2 p-2'}`}
           title="Return to Library"
         >
           <span className="material-symbols-outlined text-[20px]">arrow_back</span>
         </button>
-        <div className="pl-8 group">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-bold font-headline mb-1">Active Project</p>
-          {isEditingTitle ? (
-            <input 
-              autoFocus
-              value={editTitle}
-              onChange={e => setEditTitle(e.target.value)}
-              onBlur={submitEdit}
-              onKeyDown={e => e.key === 'Enter' && submitEdit()}
-              className="bg-transparent border-b border-primary outline-none text-on-surface text-xl tracking-tight font-body w-full truncate"
-            />
-          ) : (
-            <div className="flex items-center gap-1 cursor-text" onDoubleClick={startEdit}>
-              <h2 className="text-xl font-bold text-on-surface tracking-tight font-body leading-tight truncate" title={activeProject.title}>
-                {activeProject.title}
-              </h2>
-              <span className="material-symbols-outlined text-[14px] text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">edit</span>
+        
+        {!isMinimized && (
+          <div className="pl-8 group">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-bold font-headline mb-1">Active Project</p>
+            {isEditingTitle ? (
+              <input 
+                autoFocus
+                value={editTitle}
+                onChange={e => setEditTitle(e.target.value)}
+                onBlur={submitEdit}
+                onKeyDown={e => e.key === 'Enter' && submitEdit()}
+                className="bg-transparent border-b border-primary outline-none text-on-surface text-xl tracking-tight font-body w-full truncate"
+              />
+            ) : (
+              <div className="flex items-center gap-1 cursor-text" onDoubleClick={startEdit}>
+                <h2 className="text-xl font-bold text-on-surface tracking-tight font-body leading-tight truncate" title={activeProject.title}>
+                  {activeProject.title}
+                </h2>
+                <span className="material-symbols-outlined text-[14px] text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">edit</span>
+              </div>
+            )}
+            <div className="mt-4 flex items-center justify-start flex-wrap gap-2">
+              <span className="px-3 py-1 rounded-full bg-secondary-container/20 text-[10px] text-on-secondary-container capitalize tracking-wider border border-secondary-container/30 font-bold font-headline select-none">
+                 {activeProject.genre === 'Unassigned' ? activeProject.template : activeProject.genre}
+              </span>
             </div>
-          )}
-          <div className="mt-4 flex items-center justify-start flex-wrap gap-2">
-            <span className="px-3 py-1 rounded-full bg-secondary-container/20 text-[10px] text-on-secondary-container capitalize tracking-wider border border-secondary-container/30 font-bold font-headline select-none">
-               {activeProject.genre === 'Unassigned' ? activeProject.template : activeProject.genre}
-            </span>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Main App Navigation */}
-      <nav className="flex flex-col gap-1 flex-1 overflow-y-auto no-scrollbar pb-4 min-w-[208px]">
+      <nav className={`flex flex-col gap-1 flex-1 overflow-y-auto no-scrollbar pb-4 ${isMinimized ? 'px-3' : 'px-6 min-w-[208px]'}`}>
         {coreNav.map(item => {
           const destination = `/${activeProject.slug}/${item.path}`;
           return (
           <NavLink
             key={item.path}
             to={destination}
+            title={isMinimized ? item.label : undefined}
             className={({ isActive: active }) =>
-              `group flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all duration-300 ease-out ${active
+              `group flex items-center gap-3 py-3 rounded-xl text-sm transition-all duration-300 ease-out ${isMinimized ? 'justify-center px-0' : 'px-4'} ${active
                 ? 'bg-surface-container text-primary font-semibold border-l-2 border-primary'
                 : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
               }`
@@ -126,15 +135,19 @@ export default function ProjectSidebar() {
                 >
                   {item.icon}
                 </span>
-                <span>{item.label}</span>
+                {!isMinimized && <span>{item.label}</span>}
               </>
             )}
           </NavLink>
         )})}
 
         {/* Separator / Tools Category */}
-        <div className="mt-6 mb-2 px-2">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-600 font-bold font-headline">Project Tools</p>
+        <div className={`mt-6 mb-2 ${isMinimized ? 'text-center' : 'px-2'}`}>
+          {!isMinimized ? (
+            <p className="text-[10px] uppercase tracking-[0.2em] text-slate-600 font-bold font-headline truncate">Project Tools</p>
+          ) : (
+            <div className="h-px bg-slate-800 w-full" />
+          )}
         </div>
 
         {toolsNav.map(item => {
@@ -143,8 +156,9 @@ export default function ProjectSidebar() {
           <NavLink
             key={item.path}
             to={destination}
+            title={isMinimized ? item.label : undefined}
             className={({ isActive: active }) =>
-              `group flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-all duration-300 ease-out ${active
+              `group flex items-center gap-3 py-2.5 rounded-xl text-sm transition-all duration-300 ease-out ${isMinimized ? 'justify-center px-0' : 'px-4'} ${active
                 ? 'bg-surface-container text-primary font-semibold border-l-2 border-primary'
                 : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
               }`
@@ -156,13 +170,24 @@ export default function ProjectSidebar() {
                   style={active ? { fontVariationSettings: "'FILL' 1" } : {}}>
                   {item.icon}
                 </span>
-                <span>{item.label}</span>
+                {!isMinimized && <span>{item.label}</span>}
               </>
             )}
           </NavLink>
         )})}
       </nav>
       
+      <div className="px-4 mt-auto">
+        <button
+          onClick={() => setIsMinimized(!isMinimized)}
+          className="w-full flex items-center justify-center p-3 text-slate-500 hover:text-primary transition-colors rounded-xl hover:bg-surface-container bg-surface-container-lowest/50"
+          title={isMinimized ? "Expand Sidebar" : "Minimize Sidebar"}
+        >
+          <span className="material-symbols-outlined">
+            {isMinimized ? 'keyboard_double_arrow_right' : 'keyboard_double_arrow_left'}
+          </span>
+        </button>
+      </div>
     </motion.aside>
   );
 }

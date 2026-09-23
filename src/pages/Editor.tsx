@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useProjectStore } from '../store/useProjectStore';
 import type { Scene } from '../types/database';
+import RichTextEditor from '../components/RichTextEditor';
 
 export default function Editor() {
   const { projectSlug } = useParams<{ projectSlug: string }>();
@@ -234,12 +235,12 @@ export default function Editor() {
                 </div>
               </div>
 
-              <textarea
-                className="drop-cap font-body text-xl leading-relaxed text-on-surface/90 w-full bg-transparent border-none outline-none resize-none"
-                style={{ minHeight: '60vh', fontFamily: "'Newsreader', serif" }}
+              <RichTextEditor
+                variant="zen"
+                className="font-body text-xl leading-relaxed text-on-surface/90 w-full bg-transparent border-none outline-none resize-none min-h-[60vh] font-['Newsreader']"
+                style={{ fontFamily: "'Newsreader', serif" }}
                 value={activeScene.content}
-                onChange={e => updateSceneContent(activeScene.id, e.target.value)}
-                spellCheck={false}
+                onChange={val => updateSceneContent(activeScene.id, val)}
               />
 
             </div>
@@ -275,7 +276,7 @@ export default function Editor() {
                   ) : projectCharacters.map(char => (
                     <div key={char.id} className="flex items-center gap-3 group cursor-pointer">
                        <div className="w-10 h-10 rounded-xl bg-surface-container-high border border-outline-variant/30 overflow-hidden shrink-0">
-                         <img src={char.avatarUrl} alt={char.name} className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all" />
+                         <img src={char.avatarUrl} alt={char.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all" />
                        </div>
                       <div className="truncate">
                         <p className="text-sm font-bold text-on-surface truncate">{char.name}</p>

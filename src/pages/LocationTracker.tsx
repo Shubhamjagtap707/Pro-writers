@@ -71,7 +71,7 @@ export default function LocationTracker() {
             >
               <div className="absolute inset-0 z-0 overflow-hidden">
                 <img
-                  className="w-full h-full object-cover opacity-40 grayscale group-hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"
+                  className="w-full h-full object-cover opacity-40 transition-all duration-700 scale-105 group-hover:scale-100"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxj94NXOmGV-J19i1rs4sqxrX_1H_N52svDjhtGBT8BBijLM1x_ims4Pa_Xt04fDKe58h-SFn9wvuiTG7Ys8yOma7YW6bGJ891BlxNFcXL7zMPvhh8nL3HI1zF0l9ETR035tj8xA8WXe0sPpz6zxkBqJbzs5gypEYonARPAbc4Pd3HSXmH0fA3FSJouVZYnGzweGHleV9JAAfs-_LdFZU31fJrLcyU32aljpt_japS2MjjxtlQPLcdN6ld6NkRatPCb_WIguhBXtFN"
                   alt="Midnight at the Docks map"
                 />
@@ -148,7 +148,7 @@ export default function LocationTracker() {
                   className="bg-surface-container-low p-6 rounded-3xl border border-outline-variant/5 hover:border-primary/20 transition-all group"
                 >
                   <div className="h-32 rounded-2xl mb-6 overflow-hidden relative">
-                    <img className="w-full h-full object-cover grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-80 transition-all duration-500"
+                    <img className="w-full h-full object-cover opacity-50 group-hover:opacity-80 transition-all duration-500"
                       src={card.img} alt={card.title} />
                     <div className="absolute top-3 right-3 bg-surface/80 backdrop-blur px-2 py-1 rounded-lg text-[10px] font-bold text-on-surface">
                       {card.tag}

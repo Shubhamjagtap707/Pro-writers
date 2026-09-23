@@ -160,23 +160,6 @@ export default function Templates() {
             ))}
           </div>
 
-          {/* Footer Stats */}
-          <footer className="mt-24 py-12 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-8">
-            <div className="flex gap-12">
-              {[{ label: 'Total Words', value: '124,082' }, { label: 'Active Projects', value: '4' }].map(stat => (
-                <div key={stat.label} className="flex flex-col">
-                  <span className="font-label text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">{stat.label}</span>
-                  <span className="font-body text-3xl text-on-surface">{stat.value}</span>
-                </div>
-              ))}
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="px-4 py-2 rounded-full bg-tertiary-container/20 border border-tertiary/10 flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-tertiary shadow-[0_0_8px_rgba(255,183,131,0.6)]" />
-                <span className="text-[10px] font-bold text-tertiary uppercase tracking-widest">Writing Streak: 12 Days</span>
-              </div>
-            </div>
-          </footer>
         </div>
       </section>
 

@@ -326,12 +326,12 @@ body {
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* ── Drop Cap for Editor ── */
-.drop-cap:first-letter {
-  font-size: 4rem;
+.drop-cap .ProseMirror p:first-child:first-letter {
+  font-size: 2.5rem;
   font-weight: 700;
   float: left;
   line-height: 0.85;
-  margin-right: 0.12em;
+  margin-right: 0.08em;
   color: var(--color-primary);
   font-family: 'Newsreader', serif;
 }
@@ -341,4 +341,41 @@ body {
   display: flex;
   flex-direction: row;
   width: 100%;
+}
+
+/* ── ProseMirror Editor Styles ── */
+.ProseMirror {
+  outline: none;
+}
+.ProseMirror p {
+  margin: 0;
+  padding: 0;
+}
+.ProseMirror p.is-editor-empty:first-child::before {
+  color: var(--color-on-surface-variant);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  opacity: 0.5;
+}
+.ProseMirror ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+.ProseMirror ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+.ProseMirror li {
+  margin-bottom: 0.25rem;
+}
+.ProseMirror strong, .ProseMirror b {
+  font-weight: 700;
+  color: var(--color-on-surface);
+}
+.ProseMirror em, .ProseMirror i {
+  font-style: italic;
 }
