@@ -113,7 +113,7 @@ export default function CharacterProfile() {
 
   const addAllegiance = () => {
     if (!isEditMode || !draftChar) return;
-    const newAllegiances = [...(draftChar.allegiances || []), { id: crypto.randomUUID(), factionId: '', rank: '' }];
+    const newAllegiances = [...(draftChar.allegiances || []), { id: crypto.randomUUID(), factionId: '', rank: 'Member' }];
     setDraftChar((prev: any) => ({ ...prev, allegiances: newAllegiances }));
   };
 
@@ -524,18 +524,32 @@ export default function CharacterProfile() {
                         )}
                       </td>
                       <td className="p-6 align-middle">
-                        {isEditMode ? (
-                          <input
-                            value={row.rank}
-                            onChange={(e) => updateAllegiance(index, 'rank', e.target.value)}
-                            placeholder="e.g. Captain, Initiate"
-                            className="w-full bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 text-on-surface outline-none focus:border-primary/50 transition-colors"
-                          />
-                        ) : (
-                          <div className="text-slate-300">
-                            {row.rank || <span className="text-slate-500 italic">No rank specified</span>}
-                          </div>
-                        )}
+                        {(() => {
+                          const faction = row.factionId ? factions[row.factionId] : null;
+                          const role = faction?.roles?.find((r: any) => r.characterId === activeChar.id);
+                          const displayRank = role ? role.title : (row.rank || 'Member');
+                          
+                          if (isEditMode) {
+                            return (
+                              <div className="text-slate-500 italic py-3 text-sm">
+                                {role ? (
+                                  <span className="text-primary font-bold">{role.title}</span>
+                                ) : (
+                                  "Member (Assigned via Faction Council)"
+                                )}
+                              </div>
+                            );
+                          }
+                          return (
+                            <div className="text-slate-300 font-label uppercase tracking-widest text-sm">
+                              {role ? (
+                                <span className="text-primary font-bold">{role.title}</span>
+                              ) : (
+                                displayRank
+                              )}
+                            </div>
+                          );
+                        })()}
                       </td>
                       <td className="p-6 align-middle text-right">
                         {isEditMode && (
