@@ -68,12 +68,6 @@ export default function FactionProfile() {
     }
   };
 
-  const handleCancelEdit = () => {
-    setIsEditMode(false);
-    setDraftFaction(null);
-    setPendingMemberUpdates([]);
-  };
-
   const saveImageUrl = () => {
     handleChange('emblemUrl', tempImageUrl);
     setIsImageModalOpen(false);
