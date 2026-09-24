@@ -58,6 +58,8 @@ export default function Factions() {
     motto: '',
     description: '',
     emblemUrl: '',
+    tier: 'primary',
+    parentFactionId: '',
   });
 
   const projectFactions = Object.values(factions).filter(f => 
@@ -89,9 +91,10 @@ export default function Factions() {
       motto: newFaction.motto.trim(),
       description: newFaction.description.trim(),
       emblemUrl: newFaction.emblemUrl,
+      parentFactionId: newFaction.tier === 'primary' ? undefined : newFaction.parentFactionId,
     }, seriesId);
     setIsModalOpen(false);
-    setNewFaction({ name: '', motto: '', description: '', emblemUrl: '' });
+    setNewFaction({ name: '', motto: '', description: '', emblemUrl: '', tier: 'primary', parentFactionId: '' });
   };
 
   const renderFactionGrid = (factionsList: typeof projectFactions, title: string, subtitle: string, icon: string, showAddCard: boolean = false) => {
@@ -211,6 +214,38 @@ export default function Factions() {
               
               <div className="space-y-4">
                 <div>
+                  <label className="text-[10px] font-label text-slate-500 uppercase tracking-widest mb-2 block">Faction Tier</label>
+                  <select
+                    value={newFaction.tier}
+                    onChange={e => setNewFaction(prev => ({ ...prev, tier: e.target.value, parentFactionId: '' }))}
+                    className="w-full bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 text-on-surface outline-none focus:border-primary/50 transition-colors appearance-none"
+                  >
+                    <option value="primary">Sovereign Power (Primary Faction)</option>
+                    <option value="secondary">Great House (Secondary Faction)</option>
+                    <option value="tertiary">Minor House (Tertiary Faction)</option>
+                  </select>
+                </div>
+                
+                {newFaction.tier !== 'primary' && (
+                  <div>
+                    <label className="text-[10px] font-label text-slate-500 uppercase tracking-widest mb-2 block">
+                      {newFaction.tier === 'secondary' ? 'Sworn to Sovereign Power' : 'Sworn to Great/Minor House'}
+                    </label>
+                    <select
+                      value={newFaction.parentFactionId}
+                      onChange={e => setNewFaction(prev => ({ ...prev, parentFactionId: e.target.value }))}
+                      className="w-full bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 text-on-surface outline-none focus:border-primary/50 transition-colors appearance-none"
+                    >
+                      <option value="">Select Liege...</option>
+                      {newFaction.tier === 'secondary' 
+                        ? sovereignPowers.map(f => <option key={f.id} value={f.id}>{f.name}</option>)
+                        : [...greatHouses, ...minorHouses].map(f => <option key={f.id} value={f.id}>{f.name}</option>)
+                      }
+                    </select>
+                  </div>
+                )}
+                
+                <div>
                   <label className="text-[10px] font-label text-slate-500 uppercase tracking-widest mb-2 block">Faction Name</label>
                   <input
                     autoFocus
@@ -241,7 +276,7 @@ export default function Factions() {
                 
                 <button
                   onClick={handleCreate}
-                  disabled={!newFaction.name.trim()}
+                  disabled={!newFaction.name.trim() || (newFaction.tier !== 'primary' && !newFaction.parentFactionId)}
                   className="w-full mt-4 py-3 rounded-xl bg-primary text-on-primary font-bold tracking-widest text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-on-surface transition-colors"
                 >
                   ESTABLISH
