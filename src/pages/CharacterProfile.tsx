@@ -23,6 +23,19 @@ export default function CharacterProfile() {
   const [draftChar, setDraftChar] = useState<any>(null);
   const activeChar = (isEditMode && draftChar) ? draftChar : char;
 
+  const handleEditClick = () => {
+    if (isEditMode) {
+      if (draftChar) {
+        updateCharacter(char.id, draftChar);
+      }
+      setIsEditMode(false);
+      setDraftChar(null);
+    } else {
+      setDraftChar({ ...char });
+      setIsEditMode(true);
+    }
+  };
+
   const handleChange = (field: string, value: string) => {
     if (isEditMode) {
       if (!draftChar) return;
@@ -225,7 +238,7 @@ export default function CharacterProfile() {
               </div>
             </div>
             <button
-              onClick={() => setIsEditMode(!isEditMode)}
+              onClick={handleEditClick}
               className={`px-6 py-2 rounded-full font-bold uppercase tracking-widest text-xs transition-colors ${isEditMode ? 'bg-primary text-on-primary' : 'bg-surface-container-high text-on-surface'}`}
             >
               {isEditMode ? 'Save' : 'Edit'}
