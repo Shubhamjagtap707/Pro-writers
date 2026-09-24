@@ -27,7 +27,6 @@ export default function FactionProfile() {
   const [newDiplomacyStatus, setNewDiplomacyStatus] = useState<'Ally' | 'Enemy' | 'Trade Partner' | 'Neutral'>('Neutral');
   
   const [newMemberId, setNewMemberId] = useState('');
-  const [newMemberRank, setNewMemberRank] = useState('');
   const [newRoleTitle, setNewRoleTitle] = useState('');
   const [pendingMemberUpdates, setPendingMemberUpdates] = useState<{ charId: string, action: 'add' | 'remove', rank?: string }[]>([]);
   const [memberSearchTerm, setMemberSearchTerm] = useState('');
@@ -137,10 +136,9 @@ export default function FactionProfile() {
     if (!char) return;
     setPendingMemberUpdates(prev => {
       const filtered = prev.filter(p => p.charId !== char.id);
-      return [...filtered, { charId: char.id, action: 'add', rank: newMemberRank.trim() }];
+      return [...filtered, { charId: char.id, action: 'add', rank: 'Member' }];
     });
     setNewMemberId('');
-    setNewMemberRank('');
   };
 
   const handleRemoveMember = (charId: string) => {
@@ -544,12 +542,6 @@ export default function FactionProfile() {
                             <option key={c.id} value={c.name} />
                           ))}
                         </datalist>
-                        <input
-                          value={newMemberRank}
-                          onChange={(e) => setNewMemberRank(e.target.value)}
-                          placeholder="Rank (Optional)"
-                          className="flex-1 bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 text-on-surface outline-none focus:border-primary/50 transition-colors"
-                        />
                         <button
                           onClick={handleAddMember}
                           disabled={!newMemberId}
