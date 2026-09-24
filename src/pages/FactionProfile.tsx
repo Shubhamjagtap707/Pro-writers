@@ -26,6 +26,7 @@ export default function FactionProfile() {
   
   const [newMemberId, setNewMemberId] = useState('');
   const [newMemberRank, setNewMemberRank] = useState('');
+  const [newRoleTitle, setNewRoleTitle] = useState('');
   const [pendingMemberUpdates, setPendingMemberUpdates] = useState<{ charId: string, action: 'add' | 'remove', rank?: string }[]>([]);
   const [memberSearchTerm, setMemberSearchTerm] = useState('');
   const [memberFilterHouseId, setMemberFilterHouseId] = useState('all');
@@ -145,6 +146,23 @@ export default function FactionProfile() {
       const filtered = prev.filter(p => p.charId !== charId);
       return [...filtered, { charId, action: 'remove' }];
     });
+  };
+
+  const handleAddRole = () => {
+    if (!newRoleTitle) return;
+    const newRoles = [...(activeFaction.roles || []), { id: crypto.randomUUID(), title: newRoleTitle.trim() }];
+    handleChange('roles', newRoles);
+    setNewRoleTitle('');
+  };
+
+  const handleUpdateRole = (roleId: string, charId: string) => {
+    const newRoles = (activeFaction.roles || []).map(r => r.id === roleId ? { ...r, characterId: charId } : r);
+    handleChange('roles', newRoles);
+  };
+  
+  const handleRemoveRole = (roleId: string) => {
+    const newRoles = (activeFaction.roles || []).filter(r => r.id !== roleId);
+    handleChange('roles', newRoles);
   };
 
   return (
@@ -348,6 +366,72 @@ export default function FactionProfile() {
 
               {activeTab === 'members' && (
                 <div className="bg-surface-container-low p-8 rounded-3xl shadow-lg border border-outline-variant/10">
+                  {/* Leadership Roles */}
+                  {(activeFaction.roles && activeFaction.roles.length > 0 || isEditMode) && (
+                    <div className="mb-12 pb-8 border-b border-outline-variant/10">
+                      <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <span className="material-symbols-outlined text-sm">stars</span>
+                        Leadership Council
+                      </h3>
+                      
+                      {activeFaction.roles && activeFaction.roles.length > 0 && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                          {activeFaction.roles.map((role: any) => {
+                            const char = role.characterId ? characters[role.characterId] : null;
+                            return (
+                              <div key={role.id} className="flex items-center gap-4 p-4 rounded-2xl bg-surface border border-outline-variant/10 shadow-sm relative group">
+                                {char ? (
+                                  <img src={char.avatarUrl || DEFAULT_AVATAR} className="w-12 h-12 rounded-full object-cover border border-primary/30" />
+                                ) : (
+                                  <div className="w-12 h-12 rounded-full bg-surface-container-high border border-outline-variant/30 flex items-center justify-center">
+                                    <span className="material-symbols-outlined text-slate-500">person_off</span>
+                                  </div>
+                                )}
+                                <div className="flex-1">
+                                  <p className="text-xs font-label uppercase tracking-widest text-primary mb-1">{role.title}</p>
+                                  <h4 className="font-body font-bold text-on-surface">{char ? char.name : 'Unassigned'}</h4>
+                                </div>
+                                {isEditMode && (
+                                  <div className="flex flex-col gap-2 min-w-[120px]">
+                                    <select 
+                                      value={role.characterId || ''}
+                                      onChange={(e) => handleUpdateRole(role.id, e.target.value)}
+                                      className="bg-surface-container border border-outline-variant/30 rounded-lg px-2 py-1 text-xs outline-none focus:border-primary/50 text-on-surface"
+                                    >
+                                      <option value="">Unassigned</option>
+                                      {[...displayedMembers, ...vassalMembers].map(m => (
+                                        <option key={m.id} value={m.id}>{m.name}</option>
+                                      ))}
+                                    </select>
+                                    <button onClick={() => handleRemoveRole(role.id)} className="text-[10px] text-error hover:underline text-right font-label uppercase tracking-widest">Remove</button>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {isEditMode && (
+                        <div className="flex flex-col md:flex-row gap-4 mt-6 p-6 rounded-2xl bg-surface-container-low border border-outline-variant/10 border-dashed">
+                          <input
+                            value={newRoleTitle}
+                            onChange={(e) => setNewRoleTitle(e.target.value)}
+                            placeholder="New Role (e.g. Hand of the King)"
+                            className="flex-1 bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 text-on-surface outline-none focus:border-primary/50 transition-colors"
+                          />
+                          <button
+                            onClick={handleAddRole}
+                            disabled={!newRoleTitle}
+                            className="px-6 py-3 rounded-xl bg-primary text-on-primary font-bold tracking-widest text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/80 transition-colors whitespace-nowrap flex items-center gap-2"
+                          >
+                            <span className="material-symbols-outlined text-sm">add</span>
+                            ADD ROLE
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
                   <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
                     <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2 m-0">
                       <span className="material-symbols-outlined text-sm">group</span>

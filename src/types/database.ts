@@ -75,6 +75,7 @@ export interface Faction {
   history?: string;
   politicalInfluence?: string;
   goals?: string;
+  roles?: { id: string; title: string; characterId?: string }[];
 }
 
 export interface WorldItem {
