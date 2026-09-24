@@ -26,6 +26,7 @@ export default function FactionProfile() {
   
   const [newMemberId, setNewMemberId] = useState('');
   const [newMemberRank, setNewMemberRank] = useState('');
+  const [pendingMemberUpdates, setPendingMemberUpdates] = useState<{ charId: string, action: 'add' | 'remove', rank?: string }[]>([]);
 
   const activeFaction = (isEditMode && draftFaction) ? draftFaction : faction;
 
@@ -43,7 +44,21 @@ export default function FactionProfile() {
       // Save
       if (draftFaction) {
         updateFaction(faction.id, draftFaction);
+        pendingMemberUpdates.forEach(u => {
+          const char = characters[u.charId];
+          if (!char) return;
+          let newAllegiances = char.allegiances || [];
+          if (u.action === 'remove') {
+            newAllegiances = newAllegiances.filter(a => a.factionId !== faction.id);
+          } else if (u.action === 'add') {
+            if (!newAllegiances.some(a => a.factionId === faction.id)) {
+              newAllegiances = [...newAllegiances, { id: crypto.randomUUID(), factionId: faction.id, rank: u.rank || '' }];
+            }
+          }
+          updateCharacter(char.id, { allegiances: newAllegiances });
+        });
       }
+      setPendingMemberUpdates([]);
       setIsEditMode(false);
       setDraftFaction(null);
     } else {
@@ -56,6 +71,7 @@ export default function FactionProfile() {
   const handleCancelEdit = () => {
     setIsEditMode(false);
     setDraftFaction(null);
+    setPendingMemberUpdates([]);
   };
 
   const saveImageUrl = () => {
@@ -63,29 +79,41 @@ export default function FactionProfile() {
     setIsImageModalOpen(false);
   };
 
-  const factionMembers = Object.values(characters).filter(c => 
-    c.project_id === faction.project_id && c.allegiances?.some(a => a.factionId === faction.id)
-  );
+  const displayedMembers = Object.values(characters).filter(c => {
+    if (c.project_id !== faction.project_id) return false;
+    const isCurrentlyMember = c.allegiances?.some(a => a.factionId === faction.id);
+    const pendingAdd = pendingMemberUpdates.find(u => u.charId === c.id && u.action === 'add');
+    const pendingRemove = pendingMemberUpdates.find(u => u.charId === c.id && u.action === 'remove');
+    
+    if (isEditMode) {
+      if (pendingRemove) return false;
+      if (pendingAdd) return true;
+    }
+    return isCurrentlyMember;
+  });
 
-  const availableCharacters = Object.values(characters).filter(c => 
-    c.project_id === faction.project_id && !c.allegiances?.some(a => a.factionId === faction.id)
-  );
+  const availableCharacters = Object.values(characters).filter(c => {
+    if (c.project_id !== faction.project_id) return false;
+    return !displayedMembers.find(m => m.id === c.id);
+  });
 
   const handleAddMember = () => {
     if (!newMemberId) return;
-    const char = characters[newMemberId];
+    const char = Object.values(characters).find(c => c.name === newMemberId || c.id === newMemberId);
     if (!char) return;
-    const newAllegiances = [...(char.allegiances || []), { id: crypto.randomUUID(), factionId: faction.id, rank: newMemberRank.trim() }];
-    updateCharacter(char.id, { allegiances: newAllegiances });
+    setPendingMemberUpdates(prev => {
+      const filtered = prev.filter(p => p.charId !== char.id);
+      return [...filtered, { charId: char.id, action: 'add', rank: newMemberRank.trim() }];
+    });
     setNewMemberId('');
     setNewMemberRank('');
   };
 
   const handleRemoveMember = (charId: string) => {
-    const char = characters[charId];
-    if (!char) return;
-    const newAllegiances = (char.allegiances || []).filter(a => a.factionId !== faction.id);
-    updateCharacter(char.id, { allegiances: newAllegiances });
+    setPendingMemberUpdates(prev => {
+      const filtered = prev.filter(p => p.charId !== charId);
+      return [...filtered, { charId, action: 'remove' }];
+    });
   };
 
   return (
@@ -182,7 +210,7 @@ export default function FactionProfile() {
                   }`}
                 >
                   Members
-                  <span className="bg-surface-container-high text-xs px-2 py-0.5 rounded-full">{factionMembers.length}</span>
+                  <span className="bg-surface-container-high text-xs px-2 py-0.5 rounded-full">{displayedMembers.length}</span>
                 </button>
               </div>
 
@@ -253,61 +281,22 @@ export default function FactionProfile() {
                     Known Affiliates
                   </h3>
                   
-                  {factionMembers.length === 0 ? (
-                    <div className="text-center py-12">
-                      <span className="material-symbols-outlined text-4xl text-slate-600 mb-4 block">person_off</span>
-                      <p className="text-slate-500 font-label tracking-widest text-sm uppercase">No known members</p>
-                      <p className="text-slate-600 text-sm mt-2">Assign characters to this faction from their Character Profile.</p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {factionMembers.map(member => {
-                        const allegiance = member.allegiances?.find(a => a.factionId === faction.id);
-                        return (
-                          <div 
-                            key={member.id}
-                            onClick={() => navigate(`../characters/${member.id}`)}
-                            className="flex items-center gap-4 p-4 rounded-2xl bg-surface-container border border-outline-variant/5 hover:border-primary/30 hover:bg-surface-container-high transition-all cursor-pointer group"
-                          >
-                            <img 
-                              src={member.avatarUrl || DEFAULT_AVATAR} 
-                              alt={member.name}
-                              className="w-12 h-12 rounded-full object-cover border border-outline-variant/20"
-                            />
-                            <div className="flex-1 flex justify-between items-center">
-                              <div>
-                                <h4 className="font-body font-bold text-on-surface group-hover:text-primary transition-colors">{member.name}</h4>
-                                <p className="text-xs font-label uppercase tracking-widest text-slate-400">{allegiance?.rank || 'Unknown Rank'}</p>
-                              </div>
-                              {isEditMode && (
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); handleRemoveMember(member.id); }}
-                                  className="w-8 h-8 rounded-full text-slate-500 hover:bg-error/20 hover:text-error flex items-center justify-center transition-colors"
-                                >
-                                  <span className="material-symbols-outlined text-sm">close</span>
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-
                   {isEditMode && (
-                    <div className="mt-8 pt-8 border-t border-outline-variant/10">
+                    <div className="mb-8 pb-8 border-b border-outline-variant/10">
                       <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Add Character to Faction</h4>
                       <div className="flex flex-col md:flex-row gap-4">
-                        <select
+                        <input
+                          list="available-characters-list"
                           value={newMemberId}
                           onChange={(e) => setNewMemberId(e.target.value)}
-                          className="flex-1 bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 text-on-surface outline-none focus:border-primary/50 transition-colors appearance-none"
-                        >
-                          <option value="">Select a character...</option>
+                          placeholder="Type or select character name..."
+                          className="flex-1 bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 text-on-surface outline-none focus:border-primary/50 transition-colors"
+                        />
+                        <datalist id="available-characters-list">
                           {availableCharacters.map(c => (
-                            <option key={c.id} value={c.id}>{c.name}</option>
+                            <option key={c.id} value={c.name} />
                           ))}
-                        </select>
+                        </datalist>
                         <input
                           value={newMemberRank}
                           onChange={(e) => setNewMemberRank(e.target.value)}
@@ -322,6 +311,52 @@ export default function FactionProfile() {
                           ADD MEMBER
                         </button>
                       </div>
+                    </div>
+                  )}
+
+                  {displayedMembers.length === 0 ? (
+                    <div className="text-center py-12">
+                      <span className="material-symbols-outlined text-4xl text-slate-600 mb-4 block">person_off</span>
+                      <p className="text-slate-500 font-label tracking-widest text-sm uppercase">No known members</p>
+                      <p className="text-slate-600 text-sm mt-2">Assign characters to this faction from their Character Profile.</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {displayedMembers.map(member => {
+                        let rank = member.allegiances?.find(a => a.factionId === faction.id)?.rank || 'Unknown Rank';
+                        if (isEditMode) {
+                          const pendingAdd = pendingMemberUpdates.find(u => u.charId === member.id && u.action === 'add');
+                          if (pendingAdd && pendingAdd.rank) rank = pendingAdd.rank;
+                        }
+
+                        return (
+                          <div 
+                            key={member.id}
+                            onClick={() => navigate(`../characters/${member.id}`)}
+                            className="flex items-center gap-4 p-4 rounded-2xl bg-surface-container border border-outline-variant/5 hover:border-primary/30 hover:bg-surface-container-high transition-all cursor-pointer group"
+                          >
+                            <img 
+                              src={member.avatarUrl || DEFAULT_AVATAR} 
+                              alt={member.name}
+                              className="w-12 h-12 rounded-full object-cover border border-outline-variant/20"
+                            />
+                            <div className="flex-1 flex justify-between items-center">
+                              <div>
+                                <h4 className="font-body font-bold text-on-surface group-hover:text-primary transition-colors">{member.name}</h4>
+                                <p className="text-xs font-label uppercase tracking-widest text-slate-400">{rank}</p>
+                              </div>
+                              {isEditMode && (
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleRemoveMember(member.id); }}
+                                  className="w-8 h-8 rounded-full text-slate-500 hover:bg-error/20 hover:text-error flex items-center justify-center transition-colors"
+                                >
+                                  <span className="material-symbols-outlined text-sm">close</span>
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
