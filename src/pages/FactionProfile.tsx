@@ -562,10 +562,14 @@ export default function FactionProfile() {
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {filteredDisplayedMembers.map(member => {
-                        let rank = member.allegiances?.find(a => a.factionId === faction.id)?.rank || 'Unknown Rank';
+                        let rank = member.allegiances?.find(a => a.factionId === faction.id)?.rank || 'Member';
                         if (isEditMode) {
                           const pendingAdd = pendingMemberUpdates.find(u => u.charId === member.id && u.action === 'add');
                           if (pendingAdd && pendingAdd.rank) rank = pendingAdd.rank;
+                        }
+                        const role = activeFaction.roles?.find((r: any) => r.characterId === member.id);
+                        if (role) {
+                          rank = role.title;
                         }
 
                         return (
@@ -606,6 +610,11 @@ export default function FactionProfile() {
                         {filteredVassalMembers.map(member => {
                           const allegiance = member.allegiances?.find(a => subFactions.map(sf => sf.id).includes(a.factionId));
                           const vassalFaction = subFactions.find(sf => sf.id === allegiance?.factionId);
+                          let rank = allegiance?.rank || 'Member';
+                          const role = activeFaction.roles?.find((r: any) => r.characterId === member.id);
+                          if (role) {
+                            rank = role.title;
+                          }
                           return (
                             <div 
                               key={member.id}
@@ -620,7 +629,7 @@ export default function FactionProfile() {
                               <div className="flex-1">
                                 <h4 className="font-body font-bold text-on-surface group-hover:text-primary transition-colors text-sm">{member.name}</h4>
                                 <p className="text-[10px] font-label uppercase tracking-widest text-slate-400">
-                                  {allegiance?.rank || 'Unknown Rank'} • {vassalFaction?.name}
+                                  {rank} • {vassalFaction?.name}
                                 </p>
                               </div>
                             </div>
