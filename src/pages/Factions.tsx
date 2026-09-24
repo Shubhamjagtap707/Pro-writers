@@ -196,7 +196,7 @@ export default function Factions() {
                 </div>
 
                 {/* Info Overlay */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col justify-end bg-gradient-to-t from-surface/90 to-transparent">
+                <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col justify-end">
                   <div className={`mb-2 text-primary`}>
                     <span className="material-symbols-outlined text-xl">shield</span>
                   </div>
