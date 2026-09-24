@@ -1,0 +1,333 @@
+import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useProjectStore } from '../store/useProjectStore';
+import { motion, AnimatePresence } from 'framer-motion';
+
+import RichTextEditor from '../components/RichTextEditor';
+
+const DEFAULT_EMBLEM = 'https://images.unsplash.com/photo-1599839619722-39751411ea63?auto=format&fit=crop&w=800&q=80';
+const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1557682250-33bd709cbe85?auto=format&fit=crop&w=800&q=80';
+
+export default function FactionProfile() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { factions, updateFaction, characters } = useProjectStore();
+  const faction = id ? factions[id] : null;
+
+  if (!faction) {
+    return <div className="page-shell flex items-center justify-center text-slate-500">Faction not found</div>;
+  }
+
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [tempImageUrl, setTempImageUrl] = useState('');
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [draftFaction, setDraftFaction] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<'lore' | 'members'>('lore');
+
+  const activeFaction = (isEditMode && draftFaction) ? draftFaction : faction;
+
+  const handleChange = (field: string, value: string) => {
+    if (isEditMode) {
+      if (!draftFaction) return;
+      setDraftFaction((prev: any) => prev ? { ...prev, [field]: value } : prev);
+    } else {
+      updateFaction(faction.id, { [field]: value });
+    }
+  };
+
+  const handleEditClick = () => {
+    if (isEditMode) {
+      // Save
+      if (draftFaction) {
+        updateFaction(faction.id, draftFaction);
+      }
+      setIsEditMode(false);
+      setDraftFaction(null);
+    } else {
+      // Start edit
+      setDraftFaction({ ...faction });
+      setIsEditMode(true);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditMode(false);
+    setDraftFaction(null);
+  };
+
+  const saveImageUrl = () => {
+    handleChange('emblemUrl', tempImageUrl);
+    setIsImageModalOpen(false);
+  };
+
+  const factionMembers = Object.values(characters).filter(c => 
+    c.allegiances?.some(a => a.factionId === faction.id)
+  );
+
+  return (
+    <div className="page-shell">
+      <div className="fixed inset-0 noise-overlay pointer-events-none z-10" />
+      
+      {/* Action Bar */}
+      <div className="fixed top-24 right-8 z-40 flex gap-4">
+        <button
+          onClick={() => navigate('../factions')}
+          className="h-12 px-6 rounded-full bg-surface-container border border-outline-variant/30 text-on-surface-variant font-label tracking-widest text-xs hover:bg-surface transition-all flex items-center gap-2"
+        >
+          <span className="material-symbols-outlined text-sm">arrow_back</span>
+          ARCHIVE
+        </button>
+
+        {isEditMode && (
+          <button
+            onClick={handleCancelEdit}
+            className="h-12 px-6 rounded-full bg-surface-container border border-outline-variant/30 text-on-surface-variant font-label tracking-widest text-xs hover:bg-error/20 hover:text-error hover:border-error/50 transition-all flex items-center gap-2"
+          >
+            <span className="material-symbols-outlined text-sm">close</span>
+            CANCEL
+          </button>
+        )}
+
+        <button
+          onClick={handleEditClick}
+          className={`h-12 px-8 rounded-full font-label tracking-widest text-xs transition-all flex items-center gap-2 shadow-lg ${
+            isEditMode 
+              ? 'bg-primary text-on-primary shadow-primary/20 hover:bg-primary/90' 
+              : 'bg-surface-container-high text-on-surface hover:bg-surface-container-highest'
+          }`}
+        >
+          <span className="material-symbols-outlined text-sm">
+            {isEditMode ? 'save' : 'edit'}
+          </span>
+          {isEditMode ? 'COMMIT' : 'EDIT ALIAS'}
+        </button>
+      </div>
+
+      <div className="page-content relative z-20">
+        {/* Header Region */}
+        <div className="max-w-6xl mx-auto mb-16 pt-8">
+          <div className="flex flex-col md:flex-row gap-12 items-start">
+            {/* Emblem */}
+            <div className="w-64 shrink-0 flex flex-col gap-4">
+              <div 
+                className={`relative aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl border ${isEditMode ? 'border-primary cursor-pointer' : 'border-outline-variant/10'}`}
+                onClick={() => {
+                  if (isEditMode) {
+                    setTempImageUrl(activeFaction.emblemUrl || '');
+                    setIsImageModalOpen(true);
+                  }
+                }}
+              >
+                <img 
+                  src={activeFaction.emblemUrl || DEFAULT_EMBLEM} 
+                  alt={activeFaction.name}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/20 to-transparent" />
+                {isEditMode && (
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                    <span className="material-symbols-outlined text-4xl text-white">edit</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Core Identity */}
+            <div className="flex-1 pt-8 w-full">
+              <div className="mb-4">
+                <span className={`px-3 py-1 rounded-full text-xs font-label uppercase tracking-widest bg-surface-container ${activeFaction.color || 'text-primary'}`}>
+                  FACTION
+                </span>
+              </div>
+              
+              {isEditMode ? (
+                <input
+                  value={activeFaction.name}
+                  onChange={(e) => handleChange('name', e.target.value)}
+                  className="w-full bg-transparent text-6xl font-body font-bold text-on-surface outline-none border-b border-primary/50 mb-2 focus:border-primary transition-colors"
+                  placeholder="Faction Name"
+                />
+              ) : (
+                <h1 className="text-6xl font-body font-bold text-on-surface mb-2">{activeFaction.name}</h1>
+              )}
+              
+              {isEditMode ? (
+                <input
+                  value={activeFaction.motto}
+                  onChange={(e) => handleChange('motto', e.target.value)}
+                  className="w-full bg-transparent text-xl font-label uppercase tracking-widest text-slate-400 outline-none border-b border-primary/50 mb-8 focus:border-primary transition-colors"
+                  placeholder="Motto or Creed"
+                />
+              ) : (
+                <h2 className="text-xl font-label uppercase tracking-widest text-slate-400 mb-8">{activeFaction.motto || 'No motto established'}</h2>
+              )}
+
+              {/* Tabs */}
+              <div className="flex gap-8 border-b border-outline-variant/20 mb-8">
+                <button
+                  onClick={() => setActiveTab('lore')}
+                  className={`pb-4 text-sm font-label uppercase tracking-widest transition-colors ${
+                    activeTab === 'lore' 
+                      ? 'text-primary border-b-2 border-primary' 
+                      : 'text-slate-500 hover:text-slate-300'
+                  }`}
+                >
+                  Lore & History
+                </button>
+                <button
+                  onClick={() => setActiveTab('members')}
+                  className={`pb-4 text-sm font-label uppercase tracking-widest transition-colors flex items-center gap-2 ${
+                    activeTab === 'members' 
+                      ? 'text-primary border-b-2 border-primary' 
+                      : 'text-slate-500 hover:text-slate-300'
+                  }`}
+                >
+                  Members
+                  <span className="bg-surface-container-high text-xs px-2 py-0.5 rounded-full">{factionMembers.length}</span>
+                </button>
+              </div>
+
+              {activeTab === 'lore' && (
+                <div className="grid grid-cols-1 gap-8">
+                  {/* Summary/Description */}
+                  <div className="bg-surface-container-low p-8 rounded-3xl shadow-lg border border-outline-variant/10">
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                      <span className="material-symbols-outlined text-sm">menu_book</span>
+                      Overview
+                    </h3>
+                    <RichTextEditor readOnly={!isEditMode}
+                      value={activeFaction.description || ''}
+                      onChange={(val: string) => handleChange('description', val)}
+                      placeholder="High-level description of the faction..."
+                      className="text-slate-300"
+                    />
+                  </div>
+                  
+                  {/* History */}
+                  <div className="bg-surface-container-low p-8 rounded-3xl shadow-lg border border-outline-variant/10">
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                      <span className="material-symbols-outlined text-sm">history_edu</span>
+                      History & Origins
+                    </h3>
+                    <RichTextEditor readOnly={!isEditMode}
+                      value={activeFaction.history || ''}
+                      onChange={(val: string) => handleChange('history', val)}
+                      placeholder="How did this faction come to be?"
+                      className="text-slate-300"
+                    />
+                  </div>
+
+                  {/* Political Influence */}
+                  <div className="bg-surface-container-low p-8 rounded-3xl shadow-lg border border-outline-variant/10">
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                      <span className="material-symbols-outlined text-sm">gavel</span>
+                      Political Influence
+                    </h3>
+                    <RichTextEditor readOnly={!isEditMode}
+                      value={activeFaction.politicalInfluence || ''}
+                      onChange={(val: string) => handleChange('politicalInfluence', val)}
+                      placeholder="What power do they hold in the world?"
+                      className="text-slate-300"
+                    />
+                  </div>
+
+                  {/* Goals */}
+                  <div className="bg-surface-container-low p-8 rounded-3xl shadow-lg border border-outline-variant/10">
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                      <span className="material-symbols-outlined text-sm">flag</span>
+                      Objectives & Goals
+                    </h3>
+                    <RichTextEditor readOnly={!isEditMode}
+                      value={activeFaction.goals || ''}
+                      onChange={(val: string) => handleChange('goals', val)}
+                      placeholder="What are they trying to achieve?"
+                      className="text-slate-300"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'members' && (
+                <div className="bg-surface-container-low p-8 rounded-3xl shadow-lg border border-outline-variant/10">
+                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-sm">group</span>
+                    Known Affiliates
+                  </h3>
+                  
+                  {factionMembers.length === 0 ? (
+                    <div className="text-center py-12">
+                      <span className="material-symbols-outlined text-4xl text-slate-600 mb-4 block">person_off</span>
+                      <p className="text-slate-500 font-label tracking-widest text-sm uppercase">No known members</p>
+                      <p className="text-slate-600 text-sm mt-2">Assign characters to this faction from their Character Profile.</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {factionMembers.map(member => {
+                        const allegiance = member.allegiances?.find(a => a.factionId === faction.id);
+                        return (
+                          <div 
+                            key={member.id}
+                            onClick={() => navigate(`../characters/${member.id}`)}
+                            className="flex items-center gap-4 p-4 rounded-2xl bg-surface-container border border-outline-variant/5 hover:border-primary/30 hover:bg-surface-container-high transition-all cursor-pointer group"
+                          >
+                            <img 
+                              src={member.avatarUrl || DEFAULT_AVATAR} 
+                              alt={member.name}
+                              className="w-12 h-12 rounded-full object-cover border border-outline-variant/20"
+                            />
+                            <div>
+                              <h4 className="font-body font-bold text-on-surface group-hover:text-primary transition-colors">{member.name}</h4>
+                              <p className="text-xs font-label uppercase tracking-widest text-slate-400">{allegiance?.rank || 'Unknown Rank'}</p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Image URL Modal */}
+      <AnimatePresence>
+        {isImageModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-surface/80 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
+              className="bg-surface-container-high border border-outline-variant/30 rounded-3xl p-6 w-full max-w-md shadow-2xl relative"
+            >
+              <h3 className="font-label tracking-widest text-sm text-slate-300 uppercase mb-4">Update Emblem URL</h3>
+              <input
+                autoFocus
+                value={tempImageUrl}
+                onChange={e => setTempImageUrl(e.target.value)}
+                placeholder="https://..."
+                className="w-full bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 text-on-surface outline-none focus:border-primary/50 transition-colors mb-4"
+              />
+              <div className="flex gap-2 justify-end">
+                <button
+                  onClick={() => setIsImageModalOpen(false)}
+                  className="px-4 py-2 rounded-lg font-label text-xs tracking-widest text-slate-400 hover:text-white transition-colors"
+                >
+                  CANCEL
+                </button>
+                <button
+                  onClick={saveImageUrl}
+                  className="px-4 py-2 rounded-lg bg-primary text-on-primary font-label text-xs tracking-widest hover:bg-primary/80 transition-colors"
+                >
+                  SAVE
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}

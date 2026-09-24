@@ -10,7 +10,7 @@ import RichTextEditor from '../components/RichTextEditor';
 export default function CharacterProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { characters, updateCharacter } = useProjectStore();
+  const { characters, updateCharacter, factions } = useProjectStore();
   const char = id ? characters[id] : null;
 
   if (!char) {
@@ -90,6 +90,25 @@ export default function CharacterProfile() {
     const newArcs = [...(draftChar.relationshipArcs || [])];
     newArcs.splice(index, 1);
     setDraftChar((prev: any) => ({ ...prev, relationshipArcs: newArcs }));
+  };
+  const updateAllegiance = (index: number, field: 'factionId' | 'rank', value: string) => {
+    if (!isEditMode || !draftChar) return;
+    const newAllegiances = [...(draftChar.allegiances || [])];
+    newAllegiances[index] = { ...newAllegiances[index], [field]: value };
+    setDraftChar((prev: any) => ({ ...prev, allegiances: newAllegiances }));
+  };
+
+  const addAllegiance = () => {
+    if (!isEditMode || !draftChar) return;
+    const newAllegiances = [...(draftChar.allegiances || []), { id: crypto.randomUUID(), factionId: '', rank: '' }];
+    setDraftChar((prev: any) => ({ ...prev, allegiances: newAllegiances }));
+  };
+
+  const removeAllegiance = (index: number) => {
+    if (!isEditMode || !draftChar) return;
+    const newAllegiances = [...(draftChar.allegiances || [])];
+    newAllegiances.splice(index, 1);
+    setDraftChar((prev: any) => ({ ...prev, allegiances: newAllegiances }));
   };
 
   return (
@@ -452,6 +471,87 @@ export default function CharacterProfile() {
                   onChange={(val: string) => handleChange('otherRelationships', val)}
                 />
               </div>
+            </div>
+          </section>
+
+          {/* Factions & Allegiances */}
+          <section className="space-y-6">
+            <div className="flex items-center gap-3">
+              <span className="material-symbols-outlined text-primary text-2xl">shield</span>
+              <h3 className="font-bold text-2xl tracking-tight text-on-surface">Allegiances & Factions</h3>
+            </div>
+            <div className="bg-surface-container-low rounded-3xl shadow-lg border border-transparent focus-within:border-primary/20 transition-colors overflow-hidden">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-surface-container border-b border-outline-variant/10">
+                    <th className="p-6 text-xs font-bold text-slate-400 uppercase tracking-widest w-1/2">Faction</th>
+                    <th className="p-6 text-xs font-bold text-slate-400 uppercase tracking-widest">Rank / Role</th>
+                    <th className="p-6 w-16"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {((activeChar.allegiances as any[]) || []).map((row: any, index: number) => (
+                    <tr key={row.id} className="border-b border-outline-variant/5 last:border-0 group transition-colors hover:bg-surface/50">
+                      <td className="p-6 align-middle border-r border-outline-variant/5">
+                        {isEditMode ? (
+                          <select
+                            value={row.factionId}
+                            onChange={(e) => updateAllegiance(index, 'factionId', e.target.value)}
+                            className="w-full bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 text-on-surface outline-none focus:border-primary/50 transition-colors appearance-none"
+                          >
+                            <option value="">Select a faction...</option>
+                            {Object.values(factions).filter(f => f.project_id === activeChar.project_id || f.series_id === activeChar.series_id).map(f => (
+                              <option key={f.id} value={f.id}>{f.name}</option>
+                            ))}
+                          </select>
+                        ) : (
+                          <div className="font-bold text-lg text-on-surface">
+                            {row.factionId && factions[row.factionId] ? factions[row.factionId].name : 'Unknown Faction'}
+                          </div>
+                        )}
+                      </td>
+                      <td className="p-6 align-middle">
+                        {isEditMode ? (
+                          <input
+                            value={row.rank}
+                            onChange={(e) => updateAllegiance(index, 'rank', e.target.value)}
+                            placeholder="e.g. Captain, Initiate"
+                            className="w-full bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 text-on-surface outline-none focus:border-primary/50 transition-colors"
+                          />
+                        ) : (
+                          <div className="text-slate-300">
+                            {row.rank || <span className="text-slate-500 italic">No rank specified</span>}
+                          </div>
+                        )}
+                      </td>
+                      <td className="p-6 align-middle text-right">
+                        {isEditMode && (
+                          <button
+                            onClick={() => removeAllegiance(index)}
+                            className="text-slate-500 hover:text-error opacity-0 group-hover:opacity-100 transition-opacity p-2"
+                          >
+                            <span className="material-symbols-outlined text-lg">delete</span>
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                  {(!activeChar.allegiances || activeChar.allegiances.length === 0) && (
+                    <tr>
+                      <td colSpan={3} className="p-6 text-center text-slate-500 italic font-body">No allegiances sworn yet.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+              {isEditMode && (
+                <button
+                  onClick={addAllegiance}
+                  className="w-full p-6 flex items-center justify-center gap-2 text-xs font-bold text-primary uppercase tracking-widest hover:bg-surface-container hover:text-primary transition-colors border-t border-outline-variant/10"
+                >
+                  <span className="material-symbols-outlined text-base">add</span>
+                  Add Allegiance
+                </button>
+              )}
             </div>
           </section>
 

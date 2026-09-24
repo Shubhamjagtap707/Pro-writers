@@ -6,6 +6,8 @@ import Editor from './pages/Editor';
 import Outliner from './pages/Outliner';
 import Characters from './pages/Characters';
 import CharacterProfile from './pages/CharacterProfile';
+import Factions from './pages/Factions';
+import FactionProfile from './pages/FactionProfile';
 import WorldBuilding from './pages/WorldBuilding';
 import AiMuseLab from './pages/AiMuseLab';
 import ContinuityChecker from './pages/ContinuityChecker';
@@ -57,6 +59,8 @@ export default function App() {
                 <Route path="outliner" element={<Outliner />} />
                 <Route path="characters" element={<Characters />} />
                 <Route path="characters/:id" element={<CharacterProfile />} />
+                <Route path="factions" element={<Factions />} />
+                <Route path="factions/:id" element={<FactionProfile />} />
                 <Route path="world" element={<WorldBuilding />} />
                 <Route path="ai-muse" element={<AiMuseLab />} />
                 <Route path="continuity" element={<ContinuityChecker />} />

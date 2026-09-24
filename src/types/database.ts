@@ -60,6 +60,21 @@ export interface Character {
   relationshipArcs?: { id: string; content: string }[];
   otherRelationships?: string;
   canonChoices?: { id: string; element: string; choice: string }[];
+  allegiances?: { id: string; factionId: string; rank: string }[];
+}
+
+export interface Faction {
+  id: string; // uuid
+  project_id: string; // fk
+  series_id?: string;
+  name: string;
+  motto: string;
+  description: string;
+  emblemUrl: string;
+  color: string;
+  history?: string;
+  politicalInfluence?: string;
+  goals?: string;
 }
 
 export interface WorldItem {

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Project, Chapter, Scene, Character, WorldItem, Series } from '../types/database';
+import type { Project, Chapter, Scene, Character, WorldItem, Series, Faction } from '../types/database';
 
 interface ProjectState {
   projects: Record<string, Project>;
@@ -9,6 +9,7 @@ interface ProjectState {
   characters: Record<string, Character>;
   worldItems: Record<string, WorldItem>;
   series: Record<string, Series>;
+  factions: Record<string, Faction>;
   activeProjectId: string | null;
 
   // Actions
@@ -35,6 +36,10 @@ interface ProjectState {
   deleteCharacter: (id: string) => void;
   createWorldItem: (project_id: string, item: Omit<WorldItem, 'id' | 'project_id' | 'series_id'>, seriesId?: string) => void;
   deleteWorldItem: (id: string) => void;
+
+  createFaction: (project_id: string, faction: Omit<Faction, 'id' | 'project_id' | 'series_id'>, seriesId?: string) => string;
+  updateFaction: (id: string, updates: Partial<Faction>) => void;
+  deleteFaction: (id: string) => void;
 }
 
 export const useProjectStore = create<ProjectState>()(
@@ -46,6 +51,7 @@ export const useProjectStore = create<ProjectState>()(
       characters: {},
       worldItems: {},
       series: {},
+      factions: {},
       activeProjectId: null,
 
 
@@ -359,6 +365,24 @@ export const useProjectStore = create<ProjectState>()(
         const nextItems = { ...state.worldItems };
         delete nextItems[id];
         return { worldItems: nextItems };
+      }),
+
+      createFaction: (projectId, faction, seriesId) => {
+        const id = crypto.randomUUID();
+        set(state => ({ factions: { ...state.factions, [id]: { ...faction, id, project_id: projectId, series_id: seriesId } } }));
+        return id;
+      },
+
+      updateFaction: (id, updates) => set(state => {
+        const faction = state.factions[id];
+        if (!faction) return state;
+        return { factions: { ...state.factions, [id]: { ...faction, ...updates } } };
+      }),
+
+      deleteFaction: (id) => set(state => {
+        const nextFactions = { ...state.factions };
+        delete nextFactions[id];
+        return { factions: nextFactions };
       }),
 
       updateSceneContent: (sceneId, content) => {

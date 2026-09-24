@@ -13,6 +13,7 @@ const coreNav: NavItem[] = [
   { path: 'editor', icon: 'edit_note', label: 'Editor' },
   { path: 'outliner', icon: 'account_tree', label: 'Outline' },
   { path: 'characters', icon: 'group', label: 'Characters' },
+  { path: 'factions', icon: 'shield', label: 'Factions & Groups' },
   { path: 'world', icon: 'public', label: 'World-Building' },
   { path: 'ai-muse', icon: 'auto_awesome', label: 'AI Muse Lab' },
 ];
