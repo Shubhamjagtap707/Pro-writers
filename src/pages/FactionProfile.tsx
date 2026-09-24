@@ -91,7 +91,18 @@ export default function FactionProfile() {
     return !displayedMembers.find(m => m.id === c.id);
   });
 
-  const subFactions = Object.values(factions).filter(f => f.parentFactionId === faction.id);
+  const getAllDescendants = (parentId: string, allFactions: typeof factions, visited = new Set<string>()): typeof factions[string][] => {
+    if (visited.has(parentId)) return [];
+    visited.add(parentId);
+    const directChildren = Object.values(allFactions).filter(f => f.parentFactionId === parentId);
+    let descendants = [...directChildren];
+    for (const child of directChildren) {
+      descendants = [...descendants, ...getAllDescendants(child.id, allFactions, visited)];
+    }
+    return descendants;
+  };
+
+  const subFactions = getAllDescendants(faction.id, factions);
   const vassalMembers = Object.values(characters).filter(c => 
     c.project_id === faction.project_id && 
     c.allegiances?.some(a => subFactions.map(sf => sf.id).includes(a.factionId)) &&
