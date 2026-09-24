@@ -185,6 +185,39 @@ export default function FactionProfile() {
     handleChange('diplomacy', newDiplomacy);
   };
 
+  const FactionNode = ({ factionId, level = 0 }: { factionId: string, level?: number }) => {
+    const f = factions[factionId];
+    if (!f) return null;
+    const children = Object.values(factions).filter((child: any) => child.parentFactionId === factionId);
+    
+    return (
+      <div className="relative mt-4">
+        {level > 0 && (
+          <div className="absolute top-8 -left-8 w-8 h-[2px] bg-outline-variant/20" />
+        )}
+        
+        <div 
+          onClick={(e) => { e.stopPropagation(); navigate(`../factions/${f.id}`); }}
+          className="flex items-center gap-4 p-4 rounded-2xl bg-surface border border-outline-variant/10 hover:border-primary/50 transition-all cursor-pointer z-10 w-full max-w-sm shadow-sm relative group"
+        >
+          <img src={f.emblemUrl || DEFAULT_EMBLEM} className="w-12 h-12 rounded-lg object-cover border border-outline-variant/20 grayscale group-hover:grayscale-0 transition-all" />
+          <div className="flex-1">
+            <h4 className="font-body font-bold text-on-surface text-sm group-hover:text-primary transition-colors">{f.name}</h4>
+            <p className="text-[10px] font-label uppercase tracking-widest text-slate-400">{children.length} Vassal{children.length !== 1 ? 's' : ''}</p>
+          </div>
+        </div>
+
+        {children.length > 0 && (
+          <div className="ml-8 pl-8 border-l-2 border-outline-variant/20 relative pt-2">
+            {children.map(child => (
+              <FactionNode key={child.id} factionId={child.id} level={level + 1} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="page-shell">
       <div className="fixed inset-0 noise-overlay pointer-events-none z-10" />
@@ -608,10 +641,10 @@ export default function FactionProfile() {
               )}
 
               {activeTab === 'subfactions' && (
-                <div className="bg-surface-container-low p-8 rounded-3xl shadow-lg border border-outline-variant/10">
-                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-sm">security</span>
-                    Vassal Houses & Sub-Factions
+                <div className="bg-surface-container-low p-8 rounded-3xl shadow-lg border border-outline-variant/10 overflow-x-auto">
+                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-sm">account_tree</span>
+                    Vassal Hierarchy
                   </h3>
                   
                   {subFactions.length === 0 ? (
@@ -621,24 +654,18 @@ export default function FactionProfile() {
                       <p className="text-slate-600 text-sm mt-2">This faction has no sworn houses.</p>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {subFactions.map(subFaction => (
-                        <div 
-                          key={subFaction.id}
-                          onClick={() => navigate(`../factions/${subFaction.id}`)}
-                          className="flex items-center gap-4 p-4 rounded-2xl bg-surface-container border border-outline-variant/5 hover:border-primary/30 hover:bg-surface-container-high transition-all cursor-pointer group"
-                        >
-                          <img 
-                            src={subFaction.emblemUrl || DEFAULT_EMBLEM} 
-                            alt={subFaction.name}
-                            className="w-16 h-16 rounded-xl object-cover border border-outline-variant/20"
-                          />
-                          <div>
-                            <h4 className="font-body font-bold text-on-surface group-hover:text-primary transition-colors">{subFaction.name}</h4>
-                            <p className="text-xs font-label uppercase tracking-widest text-slate-400 truncate">{subFaction.motto || 'Sworn Vassal'}</p>
-                          </div>
+                    <div className="pt-4 pb-12 px-4 min-w-[600px]">
+                      {/* Root node of the tree is the current faction itself, conceptually, but we render its direct children */}
+                      <div className="flex flex-col border-l-2 border-outline-variant/20 ml-8 pl-8 relative">
+                        {/* Parent Faction indicator */}
+                        <div className="absolute -top-8 -left-4 flex items-center gap-2">
+                          <img src={activeFaction.emblemUrl || DEFAULT_EMBLEM} className="w-8 h-8 rounded-full border-2 border-primary object-cover" />
+                          <span className="text-xs font-bold text-primary uppercase tracking-widest">{activeFaction.name}</span>
                         </div>
-                      ))}
+                        {Object.values(factions).filter((f: any) => f.parentFactionId === faction.id).map(child => (
+                          <FactionNode key={child.id} factionId={child.id} level={1} />
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
