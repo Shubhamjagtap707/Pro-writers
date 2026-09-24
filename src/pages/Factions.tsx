@@ -64,6 +64,18 @@ export default function Factions() {
     f.project_id === activeProjectId || (seriesId && f.series_id === seriesId)
   );
 
+  const getFactionDepth = (factionId: string, visited = new Set<string>()): number => {
+    const f = factions[factionId];
+    if (!f || !f.parentFactionId) return 1;
+    if (visited.has(factionId)) return 1;
+    visited.add(factionId);
+    return 1 + getFactionDepth(f.parentFactionId, visited);
+  };
+
+  const sovereignPowers = projectFactions.filter(f => getFactionDepth(f.id) === 1);
+  const greatHouses = projectFactions.filter(f => getFactionDepth(f.id) === 2);
+  const minorHouses = projectFactions.filter(f => getFactionDepth(f.id) >= 3);
+
   const getMemberCount = (factionId: string) => {
     return Object.values(characters).filter(c => 
       c.allegiances?.some(a => a.factionId === factionId)
@@ -80,6 +92,89 @@ export default function Factions() {
     }, seriesId);
     setIsModalOpen(false);
     setNewFaction({ name: '', motto: '', description: '', emblemUrl: '' });
+  };
+
+  const renderFactionGrid = (factionsList: typeof projectFactions, title: string, subtitle: string, icon: string, showAddCard: boolean = false) => {
+    if (factionsList.length === 0 && !showAddCard) return null;
+    
+    return (
+      <div className="mb-24 relative">
+        <div className="flex flex-col items-center text-center mb-12 relative z-10">
+          <div className="absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent -z-10" />
+          <div className="bg-background px-8 inline-flex flex-col items-center">
+            <div className="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-4 border border-primary/30 shadow-[0_0_30px_rgba(var(--primary),0.2)] shadow-primary/20">
+              <span className="material-symbols-outlined text-3xl text-primary">{icon}</span>
+            </div>
+            <h3 className="text-3xl font-body font-bold text-on-surface mb-2 tracking-wide">{title}</h3>
+            <p className="text-sm font-label uppercase tracking-widest text-slate-400">{subtitle}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {factionsList.map(faction => (
+            <motion.div
+              layoutId={`faction-${faction.id}`}
+              key={faction.id}
+              className="group cursor-pointer"
+              onClick={() => navigate(`../factions/${faction.id}`)}
+              whileHover={{ y: -8 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="relative aspect-[3/4] rounded-3xl overflow-hidden bg-surface-container shadow-xl mb-4 group-hover:shadow-primary/20 transition-all border border-outline-variant/10">
+                <img 
+                  src={faction.emblemUrl || DEFAULT_EMBLEM} 
+                  alt={faction.name}
+                  className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
+                />
+                
+                {/* Action Buttons */}
+                <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); deleteFaction(faction.id); }}
+                    className="w-8 h-8 rounded-full bg-error/90 text-on-error flex items-center justify-center hover:bg-error transition-colors backdrop-blur-md"
+                  >
+                    <span className="material-symbols-outlined text-sm">delete</span>
+                  </button>
+                </div>
+
+                {/* Info Overlay */}
+                <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col justify-end">
+                  <div className="mb-2 text-primary">
+                    <span className="material-symbols-outlined text-xl">shield</span>
+                  </div>
+                  <ScrollableTitle text={faction.name} className="mb-1" />
+                  <p className="text-slate-400 font-label text-xs tracking-widest uppercase mb-4 truncate">{faction.motto || 'No motto established'}</p>
+                  
+                  <p className="text-slate-300 font-body text-sm line-clamp-2 leading-relaxed">
+                    {stripHtml(faction.description) || "Lore incomplete. Awaiting archival entries."}
+                  </p>
+
+                  <div className="mt-4 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-sm text-slate-500">group</span>
+                    <span className="text-xs font-label uppercase tracking-widest text-slate-400">
+                      {getMemberCount(faction.id)} Members
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+
+          {showAddCard && (
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              onClick={() => setIsModalOpen(true)}
+              className="aspect-[3/4] rounded-3xl border-2 border-dashed border-outline-variant/30 hover:border-primary/50 flex flex-col items-center justify-center gap-4 cursor-pointer bg-surface/30 hover:bg-surface-container-low transition-all"
+            >
+              <div className="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center">
+                <span className="material-symbols-outlined text-3xl text-primary">add</span>
+              </div>
+              <span className="font-label tracking-widest text-sm text-slate-400 uppercase">Found Faction</span>
+            </motion.div>
+          )}
+        </div>
+      </div>
+    );
   };
 
   if (!activeProjectId) {
@@ -167,68 +262,11 @@ export default function Factions() {
           </div>
         </section>
 
-        {/* Factions Grid */}
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {projectFactions.map(faction => (
-            <motion.div
-              layoutId={`faction-${faction.id}`}
-              key={faction.id}
-              className="group cursor-pointer"
-              onClick={() => navigate(`../factions/${faction.id}`)}
-              whileHover={{ y: -8 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="relative aspect-[3/4] rounded-3xl overflow-hidden bg-surface-container shadow-xl mb-4 group-hover:shadow-primary/20 transition-all border border-outline-variant/10">
-                <img 
-                  src={faction.emblemUrl || DEFAULT_EMBLEM} 
-                  alt={faction.name}
-                  className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
-                />
-                
-                {/* Action Buttons */}
-                <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); deleteFaction(faction.id); }}
-                    className="w-8 h-8 rounded-full bg-error/90 text-on-error flex items-center justify-center hover:bg-error transition-colors backdrop-blur-md"
-                  >
-                    <span className="material-symbols-outlined text-sm">delete</span>
-                  </button>
-                </div>
-
-                {/* Info Overlay */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col justify-end">
-                  <div className={`mb-2 text-primary`}>
-                    <span className="material-symbols-outlined text-xl">shield</span>
-                  </div>
-                  <ScrollableTitle text={faction.name} className="mb-1" />
-                  <p className="text-slate-400 font-label text-xs tracking-widest uppercase mb-4 truncate">{faction.motto || 'No motto established'}</p>
-                  
-                  <p className="text-slate-300 font-body text-sm line-clamp-2 leading-relaxed">
-                    {stripHtml(faction.description) || "Lore incomplete. Awaiting archival entries."}
-                  </p>
-
-                  <div className="mt-4 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-sm text-slate-500">group</span>
-                    <span className="text-xs font-label uppercase tracking-widest text-slate-400">
-                      {getMemberCount(faction.id)} Members
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-
-          {/* Create New Card */}
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            onClick={() => setIsModalOpen(true)}
-            className="aspect-[3/4] rounded-3xl border-2 border-dashed border-outline-variant/30 hover:border-primary/50 flex flex-col items-center justify-center gap-4 cursor-pointer bg-surface/30 hover:bg-surface-container-low transition-all"
-          >
-            <div className="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center">
-              <span className="material-symbols-outlined text-3xl text-primary">add</span>
-            </div>
-            <span className="font-label tracking-widest text-sm text-slate-400 uppercase">Found Faction</span>
-          </motion.div>
+        {/* Categorized Factions Grids */}
+        <div className="max-w-7xl mx-auto">
+          {renderFactionGrid(sovereignPowers, "Sovereign Powers", "Kingdoms, Empires, and Independent Guilds", "public", true)}
+          {renderFactionGrid(greatHouses, "Great Houses & Major Guilds", "Direct Vassals to Sovereign Powers", "account_balance", false)}
+          {renderFactionGrid(minorHouses, "Minor Houses & Sub-factions", "Sworn to Great Houses or lower", "security", false)}
         </div>
       </div>
     </div>
