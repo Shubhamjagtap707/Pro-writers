@@ -27,6 +27,8 @@ export default function FactionProfile() {
   const [newMemberId, setNewMemberId] = useState('');
   const [newMemberRank, setNewMemberRank] = useState('');
   const [pendingMemberUpdates, setPendingMemberUpdates] = useState<{ charId: string, action: 'add' | 'remove', rank?: string }[]>([]);
+  const [memberSearchTerm, setMemberSearchTerm] = useState('');
+  const [memberFilterHouseId, setMemberFilterHouseId] = useState('all');
 
   const activeFaction = (isEditMode && draftFaction) ? draftFaction : faction;
 
@@ -108,6 +110,23 @@ export default function FactionProfile() {
     c.allegiances?.some(a => subFactions.map(sf => sf.id).includes(a.factionId)) &&
     !displayedMembers.find(m => m.id === c.id) // exclude direct members
   );
+
+  const filteredDisplayedMembers = displayedMembers.filter(m => {
+    if (memberSearchTerm && !m.name.toLowerCase().includes(memberSearchTerm.toLowerCase())) return false;
+    if (memberFilterHouseId !== 'all' && memberFilterHouseId !== faction.id) return false;
+    return true;
+  });
+
+  const filteredVassalMembers = vassalMembers.filter(m => {
+    if (memberSearchTerm && !m.name.toLowerCase().includes(memberSearchTerm.toLowerCase())) return false;
+    if (memberFilterHouseId !== 'all' && memberFilterHouseId !== faction.id) {
+      const allegiance = m.allegiances?.find(a => subFactions.map(sf => sf.id).includes(a.factionId));
+      if (allegiance?.factionId !== memberFilterHouseId) return false;
+    } else if (memberFilterHouseId === faction.id) {
+      return false; // hide vassals if strictly filtering for main faction
+    }
+    return true;
+  });
 
   const handleAddMember = () => {
     if (!newMemberId) return;
@@ -329,10 +348,38 @@ export default function FactionProfile() {
 
               {activeTab === 'members' && (
                 <div className="bg-surface-container-low p-8 rounded-3xl shadow-lg border border-outline-variant/10">
-                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-sm">group</span>
-                    Known Affiliates
-                  </h3>
+                  <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2 m-0">
+                      <span className="material-symbols-outlined text-sm">group</span>
+                      Known Affiliates
+                    </h3>
+                    
+                    <div className="flex gap-2 w-full md:w-auto">
+                      <div className="relative flex-1 md:w-48">
+                        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">search</span>
+                        <input
+                          type="text"
+                          placeholder="Search members..."
+                          value={memberSearchTerm}
+                          onChange={(e) => setMemberSearchTerm(e.target.value)}
+                          className="w-full bg-surface border border-outline-variant/30 rounded-xl pl-9 pr-4 py-2 text-sm text-on-surface outline-none focus:border-primary/50 transition-colors"
+                        />
+                      </div>
+                      {subFactions.length > 0 && (
+                        <select
+                          value={memberFilterHouseId}
+                          onChange={(e) => setMemberFilterHouseId(e.target.value)}
+                          className="bg-surface border border-outline-variant/30 rounded-xl px-4 py-2 text-sm text-on-surface outline-none focus:border-primary/50 transition-colors appearance-none md:w-48"
+                        >
+                          <option value="all">All Houses</option>
+                          <option value={faction.id}>Direct Members Only</option>
+                          {subFactions.map(sf => (
+                            <option key={sf.id} value={sf.id}>{sf.name}</option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
+                  </div>
                   
                   {isEditMode && (
                     <div className="mb-8 pb-8 border-b border-outline-variant/10">
@@ -367,7 +414,7 @@ export default function FactionProfile() {
                     </div>
                   )}
 
-                  {displayedMembers.length === 0 ? (
+                  {filteredDisplayedMembers.length === 0 ? (
                     <div className="text-center py-12">
                       <span className="material-symbols-outlined text-4xl text-slate-600 mb-4 block">person_off</span>
                       <p className="text-slate-500 font-label tracking-widest text-sm uppercase">No known members</p>
@@ -375,7 +422,7 @@ export default function FactionProfile() {
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {displayedMembers.map(member => {
+                      {filteredDisplayedMembers.map(member => {
                         let rank = member.allegiances?.find(a => a.factionId === faction.id)?.rank || 'Unknown Rank';
                         if (isEditMode) {
                           const pendingAdd = pendingMemberUpdates.find(u => u.charId === member.id && u.action === 'add');
@@ -413,11 +460,11 @@ export default function FactionProfile() {
                     </div>
                   )}
 
-                  {vassalMembers.length > 0 && (
+                  {filteredVassalMembers.length > 0 && (
                     <div className="mt-8 pt-8 border-t border-outline-variant/10">
                       <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Sworn Characters (Via Vassals)</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-75">
-                        {vassalMembers.map(member => {
+                        {filteredVassalMembers.map(member => {
                           const allegiance = member.allegiances?.find(a => subFactions.map(sf => sf.id).includes(a.factionId));
                           const vassalFaction = subFactions.find(sf => sf.id === allegiance?.factionId);
                           return (
