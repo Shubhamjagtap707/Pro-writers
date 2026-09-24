@@ -22,7 +22,7 @@ export default function FactionProfile() {
   const [tempImageUrl, setTempImageUrl] = useState('');
   const [isEditMode, setIsEditMode] = useState(false);
   const [draftFaction, setDraftFaction] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<'lore' | 'members'>('lore');
+  const [activeTab, setActiveTab] = useState<'lore' | 'members' | 'subfactions'>('lore');
   
   const [newMemberId, setNewMemberId] = useState('');
   const [newMemberRank, setNewMemberRank] = useState('');
@@ -96,6 +96,13 @@ export default function FactionProfile() {
     if (c.project_id !== faction.project_id) return false;
     return !displayedMembers.find(m => m.id === c.id);
   });
+
+  const subFactions = Object.values(factions).filter(f => f.parentFactionId === faction.id);
+  const vassalMembers = Object.values(characters).filter(c => 
+    c.project_id === faction.project_id && 
+    c.allegiances?.some(a => subFactions.map(sf => sf.id).includes(a.factionId)) &&
+    !displayedMembers.find(m => m.id === c.id) // exclude direct members
+  );
 
   const handleAddMember = () => {
     if (!newMemberId) return;
@@ -189,6 +196,34 @@ export default function FactionProfile() {
                 <h2 className="text-xl font-label uppercase tracking-widest text-slate-400 mb-8">{activeFaction.motto || 'No motto established'}</h2>
               )}
 
+              {isEditMode ? (
+                <div className="mb-8">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-2">Sworn to (Liege / Parent Faction)</label>
+                  <select
+                    value={activeFaction.parentFactionId || ''}
+                    onChange={(e) => handleChange('parentFactionId', e.target.value)}
+                    className="w-full bg-surface-container border border-outline-variant/30 rounded-xl px-4 py-3 text-on-surface outline-none focus:border-primary/50 transition-colors appearance-none"
+                  >
+                    <option value="">None (Independent)</option>
+                    {Object.values(factions)
+                      .filter(f => f.project_id === faction.project_id && f.id !== faction.id && f.parentFactionId !== faction.id)
+                      .map(f => (
+                        <option key={f.id} value={f.id}>{f.name}</option>
+                      ))}
+                  </select>
+                </div>
+              ) : activeFaction.parentFactionId && factions[activeFaction.parentFactionId] && (
+                <div 
+                  onClick={() => navigate(`../factions/${activeFaction.parentFactionId}`)}
+                  className="inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors cursor-pointer border border-outline-variant/10"
+                >
+                  <span className="material-symbols-outlined text-sm text-primary">security</span>
+                  <span className="text-xs font-label uppercase tracking-widest text-slate-400">
+                    Sworn to <strong className="text-on-surface ml-1">{factions[activeFaction.parentFactionId].name}</strong>
+                  </span>
+                </div>
+              )}
+
               {/* Tabs */}
               <div className="flex gap-8 border-b border-outline-variant/20 mb-8">
                 <button
@@ -211,6 +246,19 @@ export default function FactionProfile() {
                 >
                   Members
                   <span className="bg-surface-container-high text-xs px-2 py-0.5 rounded-full">{displayedMembers.length}</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('subfactions')}
+                  className={`pb-4 text-sm font-label uppercase tracking-widest transition-colors flex items-center gap-2 ${
+                    activeTab === 'subfactions' 
+                      ? 'text-primary border-b-2 border-primary' 
+                      : 'text-slate-500 hover:text-slate-300'
+                  }`}
+                >
+                  Vassals
+                  {subFactions.length > 0 && (
+                    <span className="bg-surface-container-high text-xs px-2 py-0.5 rounded-full">{subFactions.length}</span>
+                  )}
                 </button>
               </div>
 
@@ -357,6 +405,74 @@ export default function FactionProfile() {
                           </div>
                         );
                       })}
+                    </div>
+                  )}
+
+                  {vassalMembers.length > 0 && (
+                    <div className="mt-8 pt-8 border-t border-outline-variant/10">
+                      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Sworn Characters (Via Vassals)</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-75">
+                        {vassalMembers.map(member => {
+                          const allegiance = member.allegiances?.find(a => subFactions.map(sf => sf.id).includes(a.factionId));
+                          const vassalFaction = subFactions.find(sf => sf.id === allegiance?.factionId);
+                          return (
+                            <div 
+                              key={member.id}
+                              onClick={() => navigate(`../characters/${member.id}`)}
+                              className="flex items-center gap-4 p-4 rounded-2xl bg-surface-container border border-outline-variant/5 hover:border-primary/30 hover:bg-surface-container-high transition-all cursor-pointer group"
+                            >
+                              <img 
+                                src={member.avatarUrl || DEFAULT_AVATAR} 
+                                alt={member.name}
+                                className="w-10 h-10 rounded-full object-cover border border-outline-variant/20 grayscale group-hover:grayscale-0 transition-all"
+                              />
+                              <div className="flex-1">
+                                <h4 className="font-body font-bold text-on-surface group-hover:text-primary transition-colors text-sm">{member.name}</h4>
+                                <p className="text-[10px] font-label uppercase tracking-widest text-slate-400">
+                                  {allegiance?.rank || 'Unknown Rank'} • {vassalFaction?.name}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'subfactions' && (
+                <div className="bg-surface-container-low p-8 rounded-3xl shadow-lg border border-outline-variant/10">
+                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-sm">security</span>
+                    Vassal Houses & Sub-Factions
+                  </h3>
+                  
+                  {subFactions.length === 0 ? (
+                    <div className="text-center py-12">
+                      <span className="material-symbols-outlined text-4xl text-slate-600 mb-4 block">account_balance</span>
+                      <p className="text-slate-500 font-label tracking-widest text-sm uppercase">No vassals</p>
+                      <p className="text-slate-600 text-sm mt-2">This faction has no sworn houses.</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {subFactions.map(subFaction => (
+                        <div 
+                          key={subFaction.id}
+                          onClick={() => navigate(`../factions/${subFaction.id}`)}
+                          className="flex items-center gap-4 p-4 rounded-2xl bg-surface-container border border-outline-variant/5 hover:border-primary/30 hover:bg-surface-container-high transition-all cursor-pointer group"
+                        >
+                          <img 
+                            src={subFaction.emblemUrl || DEFAULT_EMBLEM} 
+                            alt={subFaction.name}
+                            className="w-16 h-16 rounded-xl object-cover border border-outline-variant/20"
+                          />
+                          <div>
+                            <h4 className="font-body font-bold text-on-surface group-hover:text-primary transition-colors">{subFaction.name}</h4>
+                            <p className="text-xs font-label uppercase tracking-widest text-slate-400 truncate">{subFaction.motto || 'Sworn Vassal'}</p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
