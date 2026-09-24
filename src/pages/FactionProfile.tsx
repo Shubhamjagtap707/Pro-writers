@@ -93,7 +93,6 @@ export default function FactionProfile() {
                   alt={activeFaction.name}
                   className="absolute inset-0 w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/20 to-transparent" />
                 {isEditMode && (
                   <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                     <span className="material-symbols-outlined text-4xl text-white">edit</span>
@@ -105,7 +104,7 @@ export default function FactionProfile() {
             {/* Core Identity */}
             <div className="flex-1 pt-8 w-full">
               <div className="flex justify-between items-start mb-4">
-                <span className={`px-3 py-1 rounded-full text-xs font-label uppercase tracking-widest bg-surface-container ${activeFaction.color || 'text-primary'}`}>
+                <span className={`px-3 py-1 rounded-full text-xs font-label uppercase tracking-widest bg-surface-container text-primary`}>
                   FACTION
                 </span>
                 <button

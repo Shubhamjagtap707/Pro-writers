@@ -58,7 +58,6 @@ export default function Factions() {
     motto: '',
     description: '',
     emblemUrl: '',
-    color: 'text-primary'
   });
 
   const projectFactions = Object.values(factions).filter(f => 
@@ -78,10 +77,9 @@ export default function Factions() {
       motto: newFaction.motto.trim(),
       description: newFaction.description.trim(),
       emblemUrl: newFaction.emblemUrl,
-      color: newFaction.color
     }, seriesId);
     setIsModalOpen(false);
-    setNewFaction({ name: '', motto: '', description: '', emblemUrl: '', color: 'text-primary' });
+    setNewFaction({ name: '', motto: '', description: '', emblemUrl: '' });
   };
 
   if (!activeProjectId) {
@@ -145,20 +143,6 @@ export default function Factions() {
                     className="w-full bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 text-on-surface outline-none focus:border-primary/50 transition-colors"
                   />
                 </div>
-                <div>
-                  <label className="text-[10px] font-label text-slate-500 uppercase tracking-widest mb-2 block">Color Theme</label>
-                  <select
-                    value={newFaction.color}
-                    onChange={e => setNewFaction(prev => ({ ...prev, color: e.target.value }))}
-                    className="w-full bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 text-on-surface outline-none focus:border-primary/50 transition-colors appearance-none"
-                  >
-                    <option value="text-primary">Gold (Primary)</option>
-                    <option value="text-error">Crimson (Error)</option>
-                    <option value="text-tertiary">Emerald (Tertiary)</option>
-                    <option value="text-slate-300">Silver</option>
-                    <option value="text-purple-400">Amethyst</option>
-                  </select>
-                </div>
                 
                 <button
                   onClick={handleCreate}
@@ -201,9 +185,6 @@ export default function Factions() {
                   className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
                 />
                 
-                {/* Vignette Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/40 to-transparent" />
-                
                 {/* Action Buttons */}
                 <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button 
@@ -215,8 +196,8 @@ export default function Factions() {
                 </div>
 
                 {/* Info Overlay */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col justify-end">
-                  <div className={`mb-2 ${faction.color || 'text-primary'}`}>
+                <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col justify-end bg-gradient-to-t from-surface/90 to-transparent">
+                  <div className={`mb-2 text-primary`}>
                     <span className="material-symbols-outlined text-xl">shield</span>
                   </div>
                   <ScrollableTitle text={faction.name} className="mb-1" />
