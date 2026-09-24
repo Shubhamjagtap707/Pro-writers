@@ -24,65 +24,69 @@ export default function CharacterProfile() {
   const activeChar = (isEditMode && draftChar) ? draftChar : char;
 
   const handleChange = (field: string, value: string) => {
-    if (isEditMode) setDraftChar((prev: any) => ({ ...prev, [field]: value }));
-    else updateCharacter(char.id, { [field]: value });
+    if (isEditMode) {
+      if (!draftChar) return;
+      setDraftChar((prev: any) => prev ? { ...prev, [field]: value } : prev);
+    } else {
+      updateCharacter(char.id, { [field]: value });
+    }
   };
 
   const updateCanonChoice = (index: number, field: 'element' | 'choice', value: string) => {
-    if (!isEditMode) return;
+    if (!isEditMode || !draftChar) return;
     const newChoices = [...(draftChar.canonChoices || [])];
     newChoices[index] = { ...newChoices[index], [field]: value };
     setDraftChar((prev: any) => ({ ...prev, canonChoices: newChoices }));
   };
 
   const addCanonChoice = () => {
-    if (!isEditMode) return;
+    if (!isEditMode || !draftChar) return;
     const newChoices = [...(draftChar.canonChoices || []), { id: crypto.randomUUID(), element: '', choice: '' }];
     setDraftChar((prev: any) => ({ ...prev, canonChoices: newChoices }));
   };
 
   const removeCanonChoice = (index: number) => {
-    if (!isEditMode) return;
+    if (!isEditMode || !draftChar) return;
     const newChoices = [...(draftChar.canonChoices || [])];
     newChoices.splice(index, 1);
     setDraftChar((prev: any) => ({ ...prev, canonChoices: newChoices }));
   };
 
   const updateTitle = (index: number, value: string) => {
-    if (!isEditMode) return;
+    if (!isEditMode || !draftChar) return;
     const newTitles = [...(draftChar.titles || [])];
     newTitles[index] = { ...newTitles[index], title: value };
     setDraftChar((prev: any) => ({ ...prev, titles: newTitles }));
   };
 
   const addTitle = () => {
-    if (!isEditMode) return;
+    if (!isEditMode || !draftChar) return;
     const newTitles = [...(draftChar.titles || []), { id: crypto.randomUUID(), title: '' }];
     setDraftChar((prev: any) => ({ ...prev, titles: newTitles }));
   };
 
   const removeTitle = (index: number) => {
-    if (!isEditMode) return;
+    if (!isEditMode || !draftChar) return;
     const newTitles = [...(draftChar.titles || [])];
     newTitles.splice(index, 1);
     setDraftChar((prev: any) => ({ ...prev, titles: newTitles }));
   };
 
   const updateRelationshipArc = (index: number, value: string) => {
-    if (!isEditMode) return;
+    if (!isEditMode || !draftChar) return;
     const newArcs = [...(draftChar.relationshipArcs || [])];
     newArcs[index] = { ...newArcs[index], content: value };
     setDraftChar((prev: any) => ({ ...prev, relationshipArcs: newArcs }));
   };
 
   const addRelationshipArc = () => {
-    if (!isEditMode) return;
+    if (!isEditMode || !draftChar) return;
     const newArcs = [...(draftChar.relationshipArcs || []), { id: crypto.randomUUID(), content: '' }];
     setDraftChar((prev: any) => ({ ...prev, relationshipArcs: newArcs }));
   };
 
   const removeRelationshipArc = (index: number) => {
-    if (!isEditMode) return;
+    if (!isEditMode || !draftChar) return;
     const newArcs = [...(draftChar.relationshipArcs || [])];
     newArcs.splice(index, 1);
     setDraftChar((prev: any) => ({ ...prev, relationshipArcs: newArcs }));
