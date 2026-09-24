@@ -11,7 +11,7 @@ const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1557682250-33bd709cbe8
 export default function FactionProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { factions, updateFaction, characters } = useProjectStore();
+  const { factions, updateFaction, characters, updateCharacter } = useProjectStore();
   const faction = id ? factions[id] : null;
 
   if (!faction) {
@@ -23,6 +23,9 @@ export default function FactionProfile() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [draftFaction, setDraftFaction] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'lore' | 'members'>('lore');
+  
+  const [newMemberId, setNewMemberId] = useState('');
+  const [newMemberRank, setNewMemberRank] = useState('');
 
   const activeFaction = (isEditMode && draftFaction) ? draftFaction : faction;
 
@@ -61,8 +64,29 @@ export default function FactionProfile() {
   };
 
   const factionMembers = Object.values(characters).filter(c => 
-    c.allegiances?.some(a => a.factionId === faction.id)
+    c.project_id === faction.project_id && c.allegiances?.some(a => a.factionId === faction.id)
   );
+
+  const availableCharacters = Object.values(characters).filter(c => 
+    c.project_id === faction.project_id && !c.allegiances?.some(a => a.factionId === faction.id)
+  );
+
+  const handleAddMember = () => {
+    if (!newMemberId) return;
+    const char = characters[newMemberId];
+    if (!char) return;
+    const newAllegiances = [...(char.allegiances || []), { id: crypto.randomUUID(), factionId: faction.id, rank: newMemberRank.trim() }];
+    updateCharacter(char.id, { allegiances: newAllegiances });
+    setNewMemberId('');
+    setNewMemberRank('');
+  };
+
+  const handleRemoveMember = (charId: string) => {
+    const char = characters[charId];
+    if (!char) return;
+    const newAllegiances = (char.allegiances || []).filter(a => a.factionId !== faction.id);
+    updateCharacter(char.id, { allegiances: newAllegiances });
+  };
 
   return (
     <div className="page-shell">
@@ -250,13 +274,54 @@ export default function FactionProfile() {
                               alt={member.name}
                               className="w-12 h-12 rounded-full object-cover border border-outline-variant/20"
                             />
-                            <div>
-                              <h4 className="font-body font-bold text-on-surface group-hover:text-primary transition-colors">{member.name}</h4>
-                              <p className="text-xs font-label uppercase tracking-widest text-slate-400">{allegiance?.rank || 'Unknown Rank'}</p>
+                            <div className="flex-1 flex justify-between items-center">
+                              <div>
+                                <h4 className="font-body font-bold text-on-surface group-hover:text-primary transition-colors">{member.name}</h4>
+                                <p className="text-xs font-label uppercase tracking-widest text-slate-400">{allegiance?.rank || 'Unknown Rank'}</p>
+                              </div>
+                              {isEditMode && (
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleRemoveMember(member.id); }}
+                                  className="w-8 h-8 rounded-full text-slate-500 hover:bg-error/20 hover:text-error flex items-center justify-center transition-colors"
+                                >
+                                  <span className="material-symbols-outlined text-sm">close</span>
+                                </button>
+                              )}
                             </div>
                           </div>
                         );
                       })}
+                    </div>
+                  )}
+
+                  {isEditMode && (
+                    <div className="mt-8 pt-8 border-t border-outline-variant/10">
+                      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Add Character to Faction</h4>
+                      <div className="flex flex-col md:flex-row gap-4">
+                        <select
+                          value={newMemberId}
+                          onChange={(e) => setNewMemberId(e.target.value)}
+                          className="flex-1 bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 text-on-surface outline-none focus:border-primary/50 transition-colors appearance-none"
+                        >
+                          <option value="">Select a character...</option>
+                          {availableCharacters.map(c => (
+                            <option key={c.id} value={c.id}>{c.name}</option>
+                          ))}
+                        </select>
+                        <input
+                          value={newMemberRank}
+                          onChange={(e) => setNewMemberRank(e.target.value)}
+                          placeholder="Rank (Optional)"
+                          className="flex-1 bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 text-on-surface outline-none focus:border-primary/50 transition-colors"
+                        />
+                        <button
+                          onClick={handleAddMember}
+                          disabled={!newMemberId}
+                          className="px-6 py-3 rounded-xl bg-primary text-on-primary font-bold tracking-widest text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/80 transition-colors whitespace-nowrap"
+                        >
+                          ADD MEMBER
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
