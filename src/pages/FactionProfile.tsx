@@ -68,44 +68,14 @@ export default function FactionProfile() {
     <div className="page-shell">
       <div className="fixed inset-0 noise-overlay pointer-events-none z-10" />
       
-      {/* Action Bar */}
-      <div className="fixed top-24 right-8 z-40 flex gap-4">
-        <button
-          onClick={() => navigate('../factions')}
-          className="h-12 px-6 rounded-full bg-surface-container border border-outline-variant/30 text-on-surface-variant font-label tracking-widest text-xs hover:bg-surface transition-all flex items-center gap-2"
-        >
-          <span className="material-symbols-outlined text-sm">arrow_back</span>
-          ARCHIVE
+      <div className="page-content relative z-20 py-12">
+        <button onClick={() => navigate('../factions')} className="mb-12 text-slate-500 hover:text-primary flex items-center gap-2 transition-colors max-w-6xl mx-auto w-full">
+          <span className="material-symbols-outlined">arrow_back</span>
+          <span className="font-label text-xs uppercase tracking-widest font-bold">Back to Archive</span>
         </button>
 
-        {isEditMode && (
-          <button
-            onClick={handleCancelEdit}
-            className="h-12 px-6 rounded-full bg-surface-container border border-outline-variant/30 text-on-surface-variant font-label tracking-widest text-xs hover:bg-error/20 hover:text-error hover:border-error/50 transition-all flex items-center gap-2"
-          >
-            <span className="material-symbols-outlined text-sm">close</span>
-            CANCEL
-          </button>
-        )}
-
-        <button
-          onClick={handleEditClick}
-          className={`h-12 px-8 rounded-full font-label tracking-widest text-xs transition-all flex items-center gap-2 shadow-lg ${
-            isEditMode 
-              ? 'bg-primary text-on-primary shadow-primary/20 hover:bg-primary/90' 
-              : 'bg-surface-container-high text-on-surface hover:bg-surface-container-highest'
-          }`}
-        >
-          <span className="material-symbols-outlined text-sm">
-            {isEditMode ? 'save' : 'edit'}
-          </span>
-          {isEditMode ? 'COMMIT' : 'EDIT ALIAS'}
-        </button>
-      </div>
-
-      <div className="page-content relative z-20">
         {/* Header Region */}
-        <div className="max-w-6xl mx-auto mb-16 pt-8">
+        <div className="max-w-6xl mx-auto mb-16 pt-0">
           <div className="flex flex-col md:flex-row gap-12 items-start">
             {/* Emblem */}
             <div className="w-64 shrink-0 flex flex-col gap-4">
@@ -134,10 +104,16 @@ export default function FactionProfile() {
 
             {/* Core Identity */}
             <div className="flex-1 pt-8 w-full">
-              <div className="mb-4">
+              <div className="flex justify-between items-start mb-4">
                 <span className={`px-3 py-1 rounded-full text-xs font-label uppercase tracking-widest bg-surface-container ${activeFaction.color || 'text-primary'}`}>
                   FACTION
                 </span>
+                <button
+                  onClick={handleEditClick}
+                  className={`px-6 py-2 rounded-full font-bold uppercase tracking-widest text-xs transition-colors ${isEditMode ? 'bg-primary text-on-primary' : 'bg-surface-container-high text-on-surface'}`}
+                >
+                  {isEditMode ? 'Save' : 'Edit'}
+                </button>
               </div>
               
               {isEditMode ? (
