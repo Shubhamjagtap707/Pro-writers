@@ -190,7 +190,7 @@ export default function Factions() {
               layoutId={`faction-${faction.id}`}
               key={faction.id}
               className="group cursor-pointer"
-              onClick={() => navigate(`/factions/${faction.id}`)}
+              onClick={() => navigate(`../factions/${faction.id}`)}
               whileHover={{ y: -8 }}
               transition={{ duration: 0.3 }}
             >
