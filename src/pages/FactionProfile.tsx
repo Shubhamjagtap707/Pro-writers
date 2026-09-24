@@ -22,7 +22,9 @@ export default function FactionProfile() {
   const [tempImageUrl, setTempImageUrl] = useState('');
   const [isEditMode, setIsEditMode] = useState(false);
   const [draftFaction, setDraftFaction] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<'lore' | 'members' | 'subfactions'>('lore');
+  const [activeTab, setActiveTab] = useState<'lore' | 'members' | 'subfactions' | 'diplomacy'>('lore');
+  const [newDiplomacyTarget, setNewDiplomacyTarget] = useState('');
+  const [newDiplomacyStatus, setNewDiplomacyStatus] = useState<'Ally' | 'Enemy' | 'Trade Partner' | 'Neutral'>('Neutral');
   
   const [newMemberId, setNewMemberId] = useState('');
   const [newMemberRank, setNewMemberRank] = useState('');
@@ -165,6 +167,24 @@ export default function FactionProfile() {
     handleChange('roles', newRoles);
   };
 
+  const handleAddDiplomacy = () => {
+    if (!newDiplomacyTarget) return;
+    const newDiplomacy = [...(activeFaction.diplomacy || []), { id: crypto.randomUUID(), targetFactionId: newDiplomacyTarget, status: newDiplomacyStatus }];
+    handleChange('diplomacy', newDiplomacy);
+    setNewDiplomacyTarget('');
+    setNewDiplomacyStatus('Neutral');
+  };
+
+  const handleUpdateDiplomacy = (diplomacyId: string, status: any) => {
+    const newDiplomacy = (activeFaction.diplomacy || []).map(d => d.id === diplomacyId ? { ...d, status } : d);
+    handleChange('diplomacy', newDiplomacy);
+  };
+  
+  const handleRemoveDiplomacy = (diplomacyId: string) => {
+    const newDiplomacy = (activeFaction.diplomacy || []).filter(d => d.id !== diplomacyId);
+    handleChange('diplomacy', newDiplomacy);
+  };
+
   return (
     <div className="page-shell">
       <div className="fixed inset-0 noise-overlay pointer-events-none z-10" />
@@ -301,6 +321,16 @@ export default function FactionProfile() {
                   {subFactions.length > 0 && (
                     <span className="bg-surface-container-high text-xs px-2 py-0.5 rounded-full">{subFactions.length}</span>
                   )}
+                </button>
+                <button
+                  onClick={() => setActiveTab('diplomacy')}
+                  className={`pb-4 text-sm font-label uppercase tracking-widest transition-colors flex items-center gap-2 ${
+                    activeTab === 'diplomacy' 
+                      ? 'text-primary border-b-2 border-primary' 
+                      : 'text-slate-500 hover:text-slate-300'
+                  }`}
+                >
+                  Diplomacy
                 </button>
               </div>
 
@@ -609,6 +639,103 @@ export default function FactionProfile() {
                           </div>
                         </div>
                       ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'diplomacy' && (
+                <div className="bg-surface-container-low p-8 rounded-3xl shadow-lg border border-outline-variant/10">
+                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-sm">handshake</span>
+                    Diplomatic Relations
+                  </h3>
+                  
+                  {(!activeFaction.diplomacy || activeFaction.diplomacy.length === 0) ? (
+                    <div className="text-center py-12">
+                      <span className="material-symbols-outlined text-4xl text-slate-600 mb-4 block">public_off</span>
+                      <p className="text-slate-500 font-label tracking-widest text-sm uppercase">Isolated</p>
+                      <p className="text-slate-600 text-sm mt-2">No known relations with other factions.</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {activeFaction.diplomacy.map((rel: any) => {
+                        const targetFaction = factions[rel.targetFactionId];
+                        if (!targetFaction) return null;
+                        
+                        let statusColor = 'text-slate-400';
+                        if (rel.status === 'Ally') statusColor = 'text-green-400';
+                        if (rel.status === 'Enemy') statusColor = 'text-error';
+                        if (rel.status === 'Trade Partner') statusColor = 'text-primary';
+
+                        return (
+                          <div key={rel.id} className="flex items-center gap-4 p-4 rounded-2xl bg-surface border border-outline-variant/10 shadow-sm relative group">
+                            <img src={targetFaction.emblemUrl || DEFAULT_EMBLEM} className="w-12 h-12 rounded-xl object-cover border border-outline-variant/20" />
+                            <div className="flex-1">
+                              <h4 
+                                onClick={() => navigate(`../factions/${targetFaction.id}`)}
+                                className="font-body font-bold text-on-surface cursor-pointer hover:text-primary transition-colors"
+                              >
+                                {targetFaction.name}
+                              </h4>
+                              {!isEditMode ? (
+                                <p className={`text-xs font-label uppercase tracking-widest ${statusColor}`}>{rel.status}</p>
+                              ) : (
+                                <select
+                                  value={rel.status}
+                                  onChange={(e) => handleUpdateDiplomacy(rel.id, e.target.value)}
+                                  className="mt-1 bg-surface-container border border-outline-variant/30 rounded-lg px-2 py-1 text-xs outline-none focus:border-primary/50 text-on-surface"
+                                >
+                                  <option value="Ally">Ally</option>
+                                  <option value="Enemy">Enemy</option>
+                                  <option value="Trade Partner">Trade Partner</option>
+                                  <option value="Neutral">Neutral</option>
+                                </select>
+                              )}
+                            </div>
+                            {isEditMode && (
+                              <button onClick={() => handleRemoveDiplomacy(rel.id)} className="w-8 h-8 rounded-full text-slate-500 hover:bg-error/20 hover:text-error flex items-center justify-center transition-colors">
+                                <span className="material-symbols-outlined text-sm">close</span>
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {isEditMode && (
+                    <div className="flex flex-col md:flex-row gap-4 mt-8 p-6 rounded-2xl bg-surface-container-low border border-outline-variant/10 border-dashed">
+                      <select
+                        value={newDiplomacyTarget}
+                        onChange={(e) => setNewDiplomacyTarget(e.target.value)}
+                        className="flex-1 bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 text-on-surface outline-none focus:border-primary/50 transition-colors"
+                      >
+                        <option value="">Select Faction...</option>
+                        {Object.values(factions)
+                          .filter(f => f.id !== faction.id && !activeFaction.diplomacy?.find((d: any) => d.targetFactionId === f.id))
+                          .map(f => (
+                            <option key={f.id} value={f.id}>{f.name}</option>
+                          ))}
+                      </select>
+                      <select
+                        value={newDiplomacyStatus}
+                        onChange={(e) => setNewDiplomacyStatus(e.target.value as any)}
+                        className="flex-1 bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 text-on-surface outline-none focus:border-primary/50 transition-colors"
+                      >
+                        <option value="Ally">Ally</option>
+                        <option value="Enemy">Enemy</option>
+                        <option value="Trade Partner">Trade Partner</option>
+                        <option value="Neutral">Neutral</option>
+                      </select>
+                      <button
+                        onClick={handleAddDiplomacy}
+                        disabled={!newDiplomacyTarget}
+                        className="px-6 py-3 rounded-xl bg-primary text-on-primary font-bold tracking-widest text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/80 transition-colors whitespace-nowrap flex items-center gap-2"
+                      >
+                        <span className="material-symbols-outlined text-sm">add</span>
+                        ADD
+                      </button>
                     </div>
                   )}
                 </div>

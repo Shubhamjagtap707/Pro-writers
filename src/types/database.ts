@@ -76,6 +76,7 @@ export interface Faction {
   politicalInfluence?: string;
   goals?: string;
   roles?: { id: string; title: string; characterId?: string }[];
+  diplomacy?: { id: string; targetFactionId: string; status: 'Ally' | 'Enemy' | 'Trade Partner' | 'Neutral' }[];
 }
 
 export interface WorldItem {
