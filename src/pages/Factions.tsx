@@ -53,6 +53,7 @@ export default function Factions() {
   const seriesId = activeProject?.series_id;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [newFaction, setNewFaction] = useState({ 
     name: '', 
     motto: '',
@@ -61,6 +62,10 @@ export default function Factions() {
     tier: 'primary',
     parentFactionId: '',
   });
+
+  const toggleSection = (title: string) => {
+    setExpandedSections(prev => ({ ...prev, [title]: !prev[title] }));
+  };
 
   const projectFactions = Object.values(factions).filter(f => 
     f.project_id === activeProjectId || (seriesId && f.series_id === seriesId)
@@ -100,6 +105,11 @@ export default function Factions() {
   const renderFactionGrid = (factionsList: typeof projectFactions, title: string, subtitle: string, icon: string, showAddCard: boolean = false) => {
     if (factionsList.length === 0 && !showAddCard) return null;
     
+    const isExpanded = expandedSections[title];
+    const maxItems = showAddCard ? 3 : 4;
+    const shouldTruncate = factionsList.length > maxItems && !isExpanded;
+    const displayedFactions = shouldTruncate ? factionsList.slice(0, maxItems) : factionsList;
+    
     return (
       <div className="mb-24 relative">
         <div className="flex flex-col items-center text-center mb-12 relative z-10">
@@ -114,7 +124,7 @@ export default function Factions() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {factionsList.map(faction => (
+          {displayedFactions.map(faction => (
             <motion.div
               layoutId={`faction-${faction.id}`}
               key={faction.id}
@@ -176,6 +186,21 @@ export default function Factions() {
             </motion.div>
           )}
         </div>
+
+        {factionsList.length > maxItems && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            className="flex justify-center mt-8"
+          >
+            <button
+              onClick={() => toggleSection(title)}
+              className="flex items-center gap-2 px-6 py-2 rounded-full border border-primary/30 text-primary hover:bg-primary/10 transition-colors font-label text-[10px] tracking-widest uppercase"
+            >
+              <span>{isExpanded ? 'Show Less' : `See All (${factionsList.length})`}</span>
+              <span className="material-symbols-outlined text-sm">{isExpanded ? 'expand_less' : 'expand_more'}</span>
+            </button>
+          </motion.div>
+        )}
       </div>
     );
   };
