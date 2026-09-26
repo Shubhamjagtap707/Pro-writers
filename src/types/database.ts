@@ -71,6 +71,7 @@ export interface Faction {
   motto: string;
   description: string;
   emblemUrl: string;
+  tier?: 'primary' | 'secondary' | 'tertiary';
   parentFactionId?: string;
   history?: string;
   politicalInfluence?: string;

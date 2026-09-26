@@ -79,9 +79,9 @@ export default function Factions() {
     return 1 + getFactionDepth(f.parentFactionId, visited);
   };
 
-  const sovereignPowers = projectFactions.filter(f => getFactionDepth(f.id) === 1);
-  const greatHouses = projectFactions.filter(f => getFactionDepth(f.id) === 2);
-  const minorHouses = projectFactions.filter(f => getFactionDepth(f.id) >= 3);
+  const sovereignPowers = projectFactions.filter(f => f.tier === 'primary' || (!f.tier && getFactionDepth(f.id) === 1));
+  const greatHouses = projectFactions.filter(f => f.tier === 'secondary' || (!f.tier && getFactionDepth(f.id) === 2));
+  const minorHouses = projectFactions.filter(f => f.tier === 'tertiary' || (!f.tier && getFactionDepth(f.id) >= 3));
 
   const getMemberCount = (factionId: string) => {
     return Object.values(characters).filter(c => 
@@ -96,7 +96,7 @@ export default function Factions() {
       motto: newFaction.motto.trim(),
       description: newFaction.description.trim(),
       emblemUrl: newFaction.emblemUrl,
-      parentFactionId: newFaction.tier === 'primary' ? undefined : newFaction.parentFactionId,
+      tier: newFaction.tier as 'primary' | 'secondary' | 'tertiary',
     }, seriesId);
     setIsModalOpen(false);
     setNewFaction({ name: '', motto: '', description: '', emblemUrl: '', tier: 'primary', parentFactionId: '' });
@@ -135,16 +135,6 @@ export default function Factions() {
                 <span className="material-symbols-outlined text-sm">{isExpanded ? 'expand_less' : 'expand_more'}</span>
               </button>
             )}
-            <button 
-              onClick={() => {
-                setNewFaction(prev => ({ ...prev, tier: defaultTier, parentFactionId: '' }));
-                setIsModalOpen(true);
-              }}
-              className="w-10 h-10 rounded-full bg-surface-container border border-primary/30 text-primary flex items-center justify-center hover:bg-primary/10 transition-colors"
-              title={`Add ${title}`}
-            >
-              <span className="material-symbols-outlined">add</span>
-            </button>
           </div>
         </div>
 
@@ -248,25 +238,6 @@ export default function Factions() {
                   </select>
                 </div>
                 
-                {newFaction.tier !== 'primary' && (
-                  <div>
-                    <label className="text-[10px] font-label text-slate-500 uppercase tracking-widest mb-2 block">
-                      {newFaction.tier === 'secondary' ? 'Sworn to Sovereign Power' : 'Sworn to Great/Minor House'}
-                    </label>
-                    <select
-                      value={newFaction.parentFactionId}
-                      onChange={e => setNewFaction(prev => ({ ...prev, parentFactionId: e.target.value }))}
-                      className="w-full bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 text-on-surface outline-none focus:border-primary/50 transition-colors appearance-none"
-                    >
-                      <option value="">Select Liege...</option>
-                      {newFaction.tier === 'secondary' 
-                        ? sovereignPowers.map(f => <option key={f.id} value={f.id}>{f.name}</option>)
-                        : [...greatHouses, ...minorHouses].map(f => <option key={f.id} value={f.id}>{f.name}</option>)
-                      }
-                    </select>
-                  </div>
-                )}
-                
                 <div>
                   <label className="text-[10px] font-label text-slate-500 uppercase tracking-widest mb-2 block">Faction Name</label>
                   <input
@@ -298,7 +269,7 @@ export default function Factions() {
                 
                 <button
                   onClick={handleCreate}
-                  disabled={!newFaction.name.trim() || (newFaction.tier !== 'primary' && !newFaction.parentFactionId)}
+                  disabled={!newFaction.name.trim()}
                   className="w-full mt-4 py-3 rounded-xl bg-primary text-on-primary font-bold tracking-widest text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-on-surface transition-colors"
                 >
                   ESTABLISH
@@ -318,6 +289,19 @@ export default function Factions() {
             <p className="text-on-surface-variant font-label tracking-wide max-w-xl">Organizations, guilds, noble houses, and cabals that shape the world.</p>
           </div>
         </section>
+
+        {/* Global Page Header */}
+        <div className="max-w-7xl mx-auto flex justify-end mb-12">
+          <button
+            onClick={() => {
+              setNewFaction(prev => ({ ...prev, tier: 'primary', parentFactionId: '' }));
+              setIsModalOpen(true);
+            }}
+            className="px-6 py-2 rounded-full font-bold uppercase tracking-widest text-xs transition-colors bg-primary text-on-primary hover:bg-on-surface shadow-lg shadow-primary/20"
+          >
+            Add New Faction
+          </button>
+        </div>
 
         {/* Categorized Factions Grids */}
         <div className="max-w-7xl mx-auto">
