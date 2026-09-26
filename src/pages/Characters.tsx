@@ -216,46 +216,7 @@ export default function Characters() {
             <p className="font-headline text-[11px] uppercase tracking-widest text-slate-500 group-hover:text-on-surface transition-colors">Spawn Character</p>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-            onClick={() => {
-              if (!activeProjectId) return;
-              const charId = createCharacter(activeProjectId, {
-                name: 'Aeron Stormbreaker',
-                role: 'Protagonist',
-                archetype: 'Reluctant King',
-                avatarUrl: 'https://images.unsplash.com/photo-1629853381665-27a9223e7179?q=80&w=800&auto=format&fit=crop',
-                color: 'text-primary'
-              }, seriesId);
-              
-              updateCharacter(charId, {
-                appearance: 'Tall, broad-shouldered, and rugged — with storm-grey eyes that flash like lightning when angered or inspired. His dark brown hair, streaked faintly with silver after surviving a lightning strike, mirrors the storms that define him. A faint scar along his jaw marks his first true battle. His armor is plain and practical, bearing his personal sigil: a shattered thunderbolt.',
-                personality: 'Stoic, introspective, fiercely independent.\nCalm under pressure; storm-like when provoked.\nBelieves power must be earned — leadership is service, not privilege.\nEmpathetic to the oppressed; despises tyranny and deceit.\nDistrusts politics, preferring honesty and action.\nHaunted by guilt over lives lost under his command.\nSpeaks little but observes deeply — his silence inspires fear and loyalty alike.\nCarries quiet melancholy — a heart shaped by loss and love.',
-                background: 'Aeron’s beginnings are shrouded in mystery. He was found as an infant near the ruins of an ancient temple during a thunderstorm — crying beneath the open sky. Beside him lay a rusted pendant engraved with a forgotten symbol, a relic no scholar could decipher.\n\nHe grew up among orphans and war camps, surviving by instinct and endurance. No record names his parents; no noble house claims him. Raised by wanderers, soldiers, and mercenaries in the wild lands beyond the eastern borders, Aeron learned early that the world only respects strength and resolve.',
-                internalConflict: 'Aeron’s greatest war is within himself.\nHe craves freedom, yet destiny binds him to rule. Every step toward leadership feels like another chain on his soul. Though he never sought a crown, he cannot turn away from those who need him.',
-                externalConflict: 'The tension between his desire for freedom and the external pressure to unite the kingdoms, facing rivals like King Aelric Velarys who believe in bloodline over merit, and Commander Selene Ironwing who distrusts his instinctive leadership.',
-                weaponsAndSkills: 'Stormbreaker Blade: Forged from meteor-steel and tempered in lightning; hums faintly when danger nears.\nBattle Instincts: Master strategist known for unorthodox tactics — “feels” storms before they break.\nLeadership: Inspires unity among soldiers of rival banners; commands through respect, not fear.\nDiplomacy: Learned through hardship, not heritage — can calm kings and lead commoners alike.\nHorsemanship & Swordsmanship: Exceptional rider and close-combat fighter.',
-                themes: 'Love and Loss: Through Elara and Lyra, Aeron experiences both the beauty and pain of love.\nFreedom vs. Duty: His greatest struggle — to remain himself while bearing the weight of a kingdom.\nStrength and Compassion: He learns that true leadership lies not in domination but in empathy.\nDestiny and Free Will: Though fate crowns him king, it is his choices that make him worthy of the throne.\nLegacy of Peace: His rule ends the age of kings born by blood — beginning one ruled by merit.',
-                connections: 'Lady Elara Stormveil (First Love): She taught him how to feel before the world taught him how to endure. Represents innocence and heart.\n\nLady Lyra Faelin (Second Love): Healer with empathic magic. Represents healing, balance, and redemption. Separated by destiny.\n\nKing Aelric Velarys: A proud monarch who once allied with Aeron, now a rival.\n\nGeneral Cailen Stormrider: A rival-turned-mentor.\n\nCommander Selene Ironwing: A disciplined commander.\n\nReygar the Bold: A free-spirited warrior and truest friend.\n\nNerissa the Wanderer: A mystical nomad.',
-                roleInStory: 'Rises as a reluctant king who unites the seven kingdoms under one banner. His rule marks the dawn of a new era built on fairness, strength, and humility. The man who never sought power, but became power itself.',
-                timeline: 'Infant: Found near ruins of an ancient temple during a thunderstorm.\n\nSeventeen: Fought in the war between Velarys and Eldoria.\n\nEarly life: Wandering mercenary, saved a village during the Great Tempest of the Shattered Coast.\n\nLater life: Becomes the Last King of the Seven Kingdoms.',
-                canonChoices: [
-                  { id: crypto.randomUUID(), element: 'First Love', choice: 'Lady Elara Stormveil — gentle, pure, dies of incurable illness' },
-                  { id: crypto.randomUUID(), element: 'Second Love', choice: 'Lady Lyra Faelin — healer with magic, deep emotional bond, separated by destiny (will they meet again?)' },
-                  { id: crypto.randomUUID(), element: 'Greatest Conflict', choice: 'Freedom vs. Duty' },
-                  { id: crypto.randomUUID(), element: 'Theme', choice: 'Healing after loss, reluctant destiny, compassion as strength' },
-                  { id: crypto.randomUUID(), element: 'Fate', choice: 'Becomes the Last King of the Seven Kingdoms — unites them under peace and justice' }
-                ]
-              });
-            }}
-            className="md:col-span-3 lg:col-span-4 rounded-[2rem] border-2 border-dashed border-primary/30 flex flex-col items-center justify-center p-8 hover:border-primary/80 hover:bg-primary/5 transition-colors cursor-pointer group"
-            style={{ minHeight: 280 }}
-          >
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-              <span className="material-symbols-outlined text-primary">download</span>
-            </div>
-            <p className="font-headline text-[11px] uppercase tracking-widest text-primary text-center">Load Aeron Stormbreaker (Test)</p>
-          </motion.div>
+
 
 
           {filteredChars.map((char, index) => {
