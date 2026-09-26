@@ -288,20 +288,16 @@ export default function Factions() {
             <h2 className="text-5xl font-body font-bold text-on-surface mb-2">Factions & Groups</h2>
             <p className="text-on-surface-variant font-label tracking-wide max-w-xl">Organizations, guilds, noble houses, and cabals that shape the world.</p>
           </div>
-        </section>
-
-        {/* Global Page Header */}
-        <div className="max-w-7xl mx-auto flex justify-end mb-12">
           <button
             onClick={() => {
               setNewFaction(prev => ({ ...prev, tier: 'primary', parentFactionId: '' }));
               setIsModalOpen(true);
             }}
-            className="px-6 py-2 rounded-full font-bold uppercase tracking-widest text-xs transition-colors bg-primary text-on-primary hover:bg-on-surface shadow-lg shadow-primary/20"
+            className="px-6 py-2 rounded-full font-bold uppercase tracking-widest text-xs transition-colors bg-primary text-on-primary hover:bg-on-surface shadow-lg shadow-primary/20 whitespace-nowrap"
           >
             Add New Faction
           </button>
-        </div>
+        </section>
 
         {/* Categorized Factions Grids */}
         <div className="max-w-7xl mx-auto">
