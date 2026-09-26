@@ -102,24 +102,49 @@ export default function Factions() {
     setNewFaction({ name: '', motto: '', description: '', emblemUrl: '', tier: 'primary', parentFactionId: '' });
   };
 
-  const renderFactionGrid = (factionsList: typeof projectFactions, title: string, subtitle: string, icon: string, showAddCard: boolean = false) => {
-    if (factionsList.length === 0 && !showAddCard) return null;
+  const renderFactionGrid = (factionsList: typeof projectFactions, title: string, subtitle: string, icon: string, defaultTier: string) => {
+    if (factionsList.length === 0) return null;
     
     const isExpanded = expandedSections[title];
-    const maxItems = showAddCard ? 3 : 4;
+    const maxItems = 4;
     const shouldTruncate = factionsList.length > maxItems && !isExpanded;
     const displayedFactions = shouldTruncate ? factionsList.slice(0, maxItems) : factionsList;
     
     return (
       <div className="mb-24 relative">
-        <div className="flex flex-col items-center text-center mb-12 relative z-10">
+        <div className="flex flex-col items-center text-center mb-12 relative z-10 w-full">
           <div className="absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent -z-10" />
+          
+          {/* Centered Title */}
           <div className="bg-background px-8 inline-flex flex-col items-center">
             <div className="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-4 border border-primary/30 shadow-[0_0_30px_rgba(var(--primary),0.2)] shadow-primary/20">
               <span className="material-symbols-outlined text-3xl text-primary">{icon}</span>
             </div>
             <h3 className="text-3xl font-body font-bold text-on-surface mb-2 tracking-wide">{title}</h3>
             <p className="text-sm font-label uppercase tracking-widest text-slate-400">{subtitle}</p>
+          </div>
+
+          {/* Right Aligned Actions */}
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-4 bg-background pl-4">
+            {factionsList.length > maxItems && (
+              <button
+                onClick={() => toggleSection(title)}
+                className="flex items-center gap-2 px-4 py-2 rounded-full border border-primary/30 text-primary hover:bg-primary/10 transition-colors font-label text-[10px] tracking-widest uppercase"
+              >
+                <span>{isExpanded ? 'Show Less' : `See All (${factionsList.length})`}</span>
+                <span className="material-symbols-outlined text-sm">{isExpanded ? 'expand_less' : 'expand_more'}</span>
+              </button>
+            )}
+            <button 
+              onClick={() => {
+                setNewFaction(prev => ({ ...prev, tier: defaultTier, parentFactionId: '' }));
+                setIsModalOpen(true);
+              }}
+              className="w-10 h-10 rounded-full bg-surface-container border border-primary/30 text-primary flex items-center justify-center hover:bg-primary/10 transition-colors"
+              title={`Add ${title}`}
+            >
+              <span className="material-symbols-outlined">add</span>
+            </button>
           </div>
         </div>
 
@@ -172,35 +197,7 @@ export default function Factions() {
               </div>
             </motion.div>
           ))}
-
-          {showAddCard && (
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              onClick={() => setIsModalOpen(true)}
-              className="aspect-[3/4] rounded-3xl border-2 border-dashed border-outline-variant/30 hover:border-primary/50 flex flex-col items-center justify-center gap-4 cursor-pointer bg-surface/30 hover:bg-surface-container-low transition-all"
-            >
-              <div className="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center">
-                <span className="material-symbols-outlined text-3xl text-primary">add</span>
-              </div>
-              <span className="font-label tracking-widest text-sm text-slate-400 uppercase">Found Faction</span>
-            </motion.div>
-          )}
         </div>
-
-        {factionsList.length > maxItems && (
-          <motion.div 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            className="flex justify-center mt-8"
-          >
-            <button
-              onClick={() => toggleSection(title)}
-              className="flex items-center gap-2 px-6 py-2 rounded-full border border-primary/30 text-primary hover:bg-primary/10 transition-colors font-label text-[10px] tracking-widest uppercase"
-            >
-              <span>{isExpanded ? 'Show Less' : `See All (${factionsList.length})`}</span>
-              <span className="material-symbols-outlined text-sm">{isExpanded ? 'expand_less' : 'expand_more'}</span>
-            </button>
-          </motion.div>
-        )}
       </div>
     );
   };
@@ -324,9 +321,9 @@ export default function Factions() {
 
         {/* Categorized Factions Grids */}
         <div className="max-w-7xl mx-auto">
-          {renderFactionGrid(sovereignPowers, "Sovereign Powers", "Kingdoms, Empires, and Independent Guilds", "public", true)}
-          {renderFactionGrid(greatHouses, "Great Houses & Major Guilds", "Direct Vassals to Sovereign Powers", "account_balance", false)}
-          {renderFactionGrid(minorHouses, "Minor Houses & Sub-factions", "Sworn to Great Houses or lower", "security", false)}
+          {renderFactionGrid(sovereignPowers, "Sovereign Powers", "Kingdoms, Empires, and Independent Guilds", "public", "primary")}
+          {renderFactionGrid(greatHouses, "Great Houses & Major Guilds", "Direct Vassals to Sovereign Powers", "account_balance", "secondary")}
+          {renderFactionGrid(minorHouses, "Minor Houses & Sub-factions", "Sworn to Great Houses or lower", "security", "tertiary")}
         </div>
       </div>
     </div>
